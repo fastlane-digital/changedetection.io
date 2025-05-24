@@ -1,36 +1,43 @@
 {% extends 'base.html' %}
 {% block content %}
-    {% from '_helpers.html' import render_simple_field, render_field %}
-    <div class="edit-form">
-        <div class="box-wrap inner">
-            <h4>Backups</h4>
+    {% from '_helpers.html' import render_simple_field, render_field, render_button %}
+    <div class="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="bg-base-100 p-6 rounded-box shadow-xl space-y-6">
+            <h1 class="text-2xl font-semibold mb-4">Backups</h1>
+            
             {% if backup_running %}
-                <p>
-                    <strong>A backup is running!</strong>
-                </p>
+                <div role="alert" class="alert alert-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span><strong>A backup is running!</strong> Please wait for it to complete before starting a new one.</span>
+                </div>
             {% endif %}
-            <p>
-                Here you can download and request a new backup, when a backup is completed you will see it listed below.
+            
+            <p class="text-sm text-base-content/80">
+                Here you can download and request a new backup. When a backup is completed, it will be listed below.
             </p>
-            <br>
+            
+            <div>
+                <h2 class="text-lg font-medium mb-2">Available Backups:</h2>
                 {% if available_backups %}
-                    <ul>
+                    <div class="space-y-2">
                     {% for backup in available_backups %}
-                        <li><a href="{{ url_for('backups.download_backup', filename=backup["filename"]) }}">{{ backup["filename"] }}</a> {{  backup["filesize"] }} Mb</li>
+                        <div>
+                            <a href="{{ url_for('backups.download_backup', filename=backup["filename"]) }}" class="link link-hover text-primary">{{ backup["filename"] }}</a>
+                            <span class="text-xs text-base-content/70 ml-2">({{ backup["filesize"] }} Mb)</span>
+                        </div>
                     {% endfor %}
-                    </ul>
+                    </div>
                 {% else %}
-                    <p>
-                    <strong>No backups found.</strong>
-                    </p>
+                    <p class="font-semibold text-sm">No backups found.</p>
                 {% endif %}
+            </div>
 
-            <a class="pure-button pure-button-primary" href="{{ url_for('backups.request_backup') }}">Create backup</a>
-            {% if available_backups %}
-                <a class="pure-button button-small button-error " href="{{ url_for('backups.remove_backups') }}">Remove backups</a>
-            {% endif %}
+            <div class="flex flex-wrap gap-4 mt-6">
+                <a class="btn btn-primary normal-case" href="{{ url_for('backups.request_backup') }}">Create new backup</a>
+                {% if available_backups %}
+                    <a class="btn btn-error btn-outline btn-sm normal-case" href="{{ url_for('backups.remove_backups') }}" onclick="return confirm('Are you sure you want to remove all backups? This cannot be undone.');">Remove all backups</a>
+                {% endif %}
+            </div>
         </div>
     </div>
-
-
 {% endblock %}

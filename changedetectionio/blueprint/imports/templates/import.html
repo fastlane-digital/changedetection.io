@@ -1,123 +1,88 @@
 {% extends 'base.html' %}
 {% block content %}
-{% from '_helpers.html' import render_field %}
+{% from '_helpers.html' import render_field, render_button %}
 <script src="{{url_for('static_content', group='js', filename='tabs.js')}}" defer></script>
-<div class="edit-form monospaced-textarea">
 
-    <div class="tabs collapsable">
-        <ul>
-            <li class="tab" id=""><a href="#url-list">URL List</a></li>
-            <li class="tab"><a href="#distill-io">Distill.io</a></li>
-            <li class="tab"><a href="#xlsx">.XLSX &amp; Wachete</a></li>
-        </ul>
+<div class="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
+    <div role="tablist" class="tabs tabs-lifted tabs-sm sm:tabs-md">
+        <a role="tab" class="tab tab-active" href="#url-list">URL List</a>
+        <a role="tab" class="tab" href="#distill-io">Distill.io</a>
+        <a role="tab" class="tab" href="#xlsx">.XLSX &amp; Wachete</a>
     </div>
 
-    <div class="box-wrap inner">
-        <form class="pure-form" action="{{url_for('imports.import_page')}}" method="POST" enctype="multipart/form-data">
+    <div class="bg-base-100 p-4 sm:p-6 rounded-box shadow-xl mt-0 border border-base-300 border-t-0">
+        <form action="{{url_for('imports.import_page')}}" method="POST" enctype="multipart/form-data" class="space-y-8">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="tab-pane-inner" id="url-list">
-                <div class="pure-control-group">
-                        Enter one URL per line, and optionally add tags for each URL after a space, delineated by comma
-                        (,):
-                        <br>
-                        <p><strong>Example:  </strong><code>https://example.com tag1, tag2, last tag</code></p>
-                        URLs which do not pass validation will stay in the textarea.
+
+            <div class="tab-pane-inner p-4 pt-6 space-y-6" id="url-list">
+                <div class="text-sm text-base-content/80 mb-4">
+                    <p>Enter one URL per line, and optionally add tags for each URL after a space, delineated by comma (,):</p>
+                    <p class="mt-1"><strong>Example:</strong> <kbd class="kbd kbd-sm">https://example.com tag1, tag2, last tag</kbd></p>
+                    <p class="mt-1">URLs which do not pass validation will stay in the textarea.</p>
                 </div>
-                {{ render_field(form.processor, class="processor") }}
                 
-                <div class="pure-control-group">
-                    <textarea name="urls" class="pure-input-1-2" placeholder="https://"
-                              style="width: 100%;
-                                font-family:monospace;
-                                white-space: pre;
-                                overflow-wrap: normal;
-                                overflow-x: scroll;" rows="25">{{ import_url_list_remaining }}</textarea>
+                {# Assuming form.processor is a RadioField or SelectField, render_field should handle it. #}
+                {{ render_field(form.processor, div_class="processor-field-wrapper") }}
+                
+                <div>
+                    <label class="label" for="urls-textarea"><span class="label-text">URLs to import:</span></label>
+                    <textarea id="urls-textarea" name="urls" class="textarea textarea-bordered leading-normal w-full h-60 font-mono text-sm" placeholder="https://...">{{ import_url_list_remaining }}</textarea>
                  </div>
                  <div id="quick-watch-processor-type"></div>
-
             </div>
 
-            <div class="tab-pane-inner" id="distill-io">
+            <div class="tab-pane-inner p-4 pt-6 space-y-6" id="distill-io">
+                <div class="text-sm text-base-content/80 mb-4 space-y-1">
+                    <p>Copy and Paste your Distill.io watch 'export' file, this should be a JSON file.</p>
+                    <p>This is <i>experimental</i>, supported fields are <code>name</code>, <code>uri</code>, <code>tags</code>, <code>config:selections</code>, the rest (including <code>schedule</code>) are ignored.</p>
+                    <p>How to export? <a href="https://distill.io/docs/web-monitor/how-export-and-import-monitors/" class="link link-hover" target="_blank" rel="noopener">https://distill.io/docs/web-monitor/how-export-and-import-monitors/</a></p>
+                    <p>Be sure to set your default fetcher to Chrome if required.</p>
+                </div>
+                <div>
+                    <label class="label" for="distill-io-textarea"><span class="label-text">Distill.io JSON:</span></label>
+                    <textarea id="distill-io-textarea" name="distill-io" class="textarea textarea-bordered leading-normal w-full h-60 font-mono text-sm" placeholder="Example Distill.io JSON export file...">{Pasted JSON example ommitted for brevity...}{{ original_distill_json }}</textarea>
+                </div>
+            </div>
 
-
-
-                    <div class="pure-control-group">
-                        Copy and Paste your Distill.io watch 'export' file, this should be a JSON file.<br>
-                        This is <i>experimental</i>, supported fields are <code>name</code>, <code>uri</code>, <code>tags</code>, <code>config:selections</code>, the rest (including <code>schedule</code>) are ignored.
-                        <br>
-                        <p>
-                        How to export? <a href="https://distill.io/docs/web-monitor/how-export-and-import-monitors/">https://distill.io/docs/web-monitor/how-export-and-import-monitors/</a><br>
-                        Be sure to set your default fetcher to Chrome if required.<br>
-                        </p>
+            <div class="tab-pane-inner p-4 pt-6 space-y-6" id="xlsx">
+                {{ render_field(form.xlsx_file, class="file-input file-input-bordered file-input-primary w-full max-w-md") }}
+                {{ render_field(form.file_mapping, class="select select-bordered w-full max-w-md") }}
+                
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text-alt">Table of custom column and data types mapping for the <strong>Custom mapping</strong> File mapping type.</span></label>
+                    <div class="overflow-x-auto">
+                        <table class="table table-compact w-full my-2 text-sm border border-base-300 rounded-lg">
+                            <thead class="bg-base-200">
+                                <tr>
+                                    <th class="p-2">Column #</th>
+                                    {% for n in range(4) %}
+                                        <td class="p-2"><input type="number" name="custom_xlsx[col_{{n}}]" class="input input-bordered input-xs w-20" min="1"></td>
+                                    {%  endfor %}
+                                </tr>
+                                <tr>
+                                    <th class="p-2">Type</th>
+                                    {% for n in range(4) %}
+                                        <td class="p-2">
+                                            <select name="custom_xlsx[col_type_{{n}}]" class="select select-bordered select-xs w-full max-w-[120px]">
+                                                <option value="">-- none --</option>
+                                                <option value="url">URL</option>
+                                                <option value="title">Title</option>
+                                                <option value="include_filters">CSS/xPath filter</option>
+                                                <option value="tag">Group / Tag name(s)</option>
+                                                <option value="interval_minutes">Recheck time (minutes)</option>
+                                            </select>
+                                        </td>
+                                    {%  endfor %}
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
-
-
-                    <textarea name="distill-io" class="pure-input-1-2" style="width: 100%;
-                                font-family:monospace;
-                                white-space: pre;
-                                overflow-wrap: normal;
-                                overflow-x: scroll;" placeholder="Example Distill.io JSON export file
-
-{
-    &quot;client&quot;: {
-        &quot;local&quot;: 1
-    },
-    &quot;data&quot;: [
-        {
-            &quot;name&quot;: &quot;Unraid | News&quot;,
-            &quot;uri&quot;: &quot;https://unraid.net/blog&quot;,
-            &quot;config&quot;: &quot;{\&quot;selections\&quot;:[{\&quot;frames\&quot;:[{\&quot;index\&quot;:0,\&quot;excludes\&quot;:[],\&quot;includes\&quot;:[{\&quot;type\&quot;:\&quot;xpath\&quot;,\&quot;expr\&quot;:\&quot;(//div[@id='App']/div[contains(@class,'flex')]/main[contains(@class,'relative')]/section[contains(@class,'relative')]/div[@class='container']/div[contains(@class,'flex')]/div[contains(@class,'w-full')])[1]\&quot;}]}],\&quot;dynamic\&quot;:true,\&quot;delay\&quot;:2}],\&quot;ignoreEmptyText\&quot;:true,\&quot;includeStyle\&quot;:false,\&quot;dataAttr\&quot;:\&quot;text\&quot;}&quot;,
-            &quot;tags&quot;: [],
-            &quot;content_type&quot;: 2,
-            &quot;state&quot;: 40,
-            &quot;schedule&quot;: &quot;{\&quot;type\&quot;:\&quot;INTERVAL\&quot;,\&quot;params\&quot;:{\&quot;interval\&quot;:4447}}&quot;,
-            &quot;ts&quot;: &quot;2022-03-27T15:51:15.667Z&quot;
-        }
-    ]
-}
-" rows="25">{{ original_distill_json }}</textarea>
-
-            </div>
-            <div class="tab-pane-inner" id="xlsx">
-            <fieldset>
-                <div class="pure-control-group">
-                {{ render_field(form.xlsx_file, class="processor") }}
-                </div>
-                <div class="pure-control-group">
-                    {{ render_field(form.file_mapping, class="processor") }}
-                </div>
-            </fieldset>
-                <div class="pure-control-group">
-                <span class="pure-form-message-inline">
-                    Table of custom column and data types mapping for the <strong>Custom mapping</strong> File mapping type.
-                </span>
-                    <table style="border: 1px solid #aaa; padding: 0.5rem; border-radius: 4px;">
-                        <tr>
-                            <td><strong>Column #</strong></td>
-                            {% for n in range(4) %}
-                                <td><input type="number" name="custom_xlsx[col_{{n}}]" style="width: 4rem;" min="1"></td>
-                            {%  endfor %}
-                        </tr>
-                        <tr>
-                            <td><strong>Type</strong></td>
-                            {% for n in range(4) %}
-                                <td><select name="custom_xlsx[col_type_{{n}}]">
-                                    <option value="" style="color: #aaa"> -- none --</option>
-                                    <option value="url">URL</option>
-                                    <option value="title">Title</option>
-                                    <option value="include_filters">CSS/xPath filter</option>
-                                    <option value="tag">Group / Tag name(s)</option>
-                                    <option value="interval_minutes">Recheck time (minutes)</option>
-                                </select></td>
-                            {%  endfor %}
-                        </tr>
-                    </table>
                 </div>
             </div>
-            <button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Import</button>
+            <div class="pt-4"> <!-- Added padding top for separation -->
+                {{ render_button(form.submit, text="Import", class="btn btn-primary w-full sm:w-auto") }}
+            </div>
         </form>
-
     </div>
 </div>
-
 {% endblock %}

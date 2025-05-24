@@ -1,23 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="login-form">
- <div class="inner">
-    <form class="pure-form pure-form-stacked" action="{{url_for('login')}}" method="POST">
+<div class="flex justify-center items-center min-h-[calc(100vh-10rem)]">
+  <div class="bg-base-100 p-8 rounded-lg shadow-xl w-full max-w-sm">
+    <form action="{{url_for('login')}}" method="POST">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <fieldset>
-            <div class="pure-control-group">
-                <label for="password">Password</label>
+            <div class="form-control w-full">
+                <label class="label" for="password">
+                    <span class="label-text">Password</span>
+                </label>
                 <input type="password" id="password" required="" name="password" value=""
-                       size="15" autofocus />
+                       class="input input-bordered w-full" autofocus />
                 <input type="hidden" id="email" name="email" value="defaultuser@changedetection.io" >
             </div>
-            <div class="pure-control-group">
-                <button type="submit" class="pure-button pure-button-primary">Login</button>
+            <div class="form-control w-full mt-6">
+                <button type="submit" class="btn btn-primary w-full">Login</button>
             </div>
         </fieldset>
     </form>
   </div>
- </div>
+</div>
 
 {% endblock %}

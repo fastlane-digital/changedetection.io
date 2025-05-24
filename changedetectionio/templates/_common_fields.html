@@ -2,56 +2,59 @@
 {% from '_helpers.html' import render_field %}
 
 {% macro render_common_settings_form(form, emailprefix, settings_application, extra_notification_token_placeholder_info) %}
-                        <div class="pure-control-group">
+                        <div class="form-control w-full mb-4">
                             {{ render_field(form.notification_urls, rows=5, placeholder="Examples:
     Gitter - gitter://token/room
     Office365 - o365://TenantID:AccountEmail/ClientID/ClientSecret/TargetEmail
     AWS SNS - sns://AccessKeyID/AccessSecretKey/RegionName/+PhoneNo
     SMTPS - mailtos://user:pass@mail.domain.com?to=receivingAddress@example.com",
-    class="notification-urls" )
+    class="textarea textarea-bordered leading-normal notification-urls" )
                             }}
-                            <div class="pure-form-message-inline">
-                                <p>
-                                <strong>Tip:</strong> Use <a target="newwindow" href="https://github.com/caronc/apprise">AppRise Notification URLs</a> for notification to just about any service! <i><a target="newwindow" href="https://github.com/dgtlmoon/changedetection.io/wiki/Notification-configuration-notes">Please read the notification services wiki here for important configuration notes</a></i>.<br>
-</p>
-                                <div data-target="#advanced-help-notifications" class="toggle-show pure-button button-tag button-xsmall">Show advanced help and tips</div>
-                                <ul style="display: none" id="advanced-help-notifications">
-                                <li><code><a target="newwindow" href="https://github.com/caronc/apprise/wiki/Notify_discord">discord://</a></code> (or <code>https://discord.com/api/webhooks...</code>)) only supports a maximum <strong>2,000 characters</strong> of notification text, including the title.</li>
-                                <li><code><a target="newwindow" href="https://github.com/caronc/apprise/wiki/Notify_telegram">tgram://</a></code> bots can't send messages to other bots, so you should specify chat ID of non-bot user.</li>
-                                <li><code><a target="newwindow" href="https://github.com/caronc/apprise/wiki/Notify_telegram">tgram://</a></code> only supports very limited HTML and can fail when extra tags are sent, <a href="https://core.telegram.org/bots/api#html-style">read more here</a> (or use plaintext/markdown format)</li>
-                                <li><code>gets://</code>, <code>posts://</code>, <code>puts://</code>, <code>deletes://</code> for direct API calls (or omit the "<code>s</code>" for non-SSL ie <code>get://</code>) <a href="https://github.com/dgtlmoon/changedetection.io/wiki/Notification-configuration-notes#postposts">more help here</a></li>
-                                  <li>Accepts the <code>{{ '{{token}}' }}</code> placeholders listed below</li>
-                              </ul>
-                            </div>
-                            <div class="notifications-wrapper">
-                              <a id="send-test-notification" class="pure-button button-secondary button-xsmall" >Send test notification</a> <div class="spinner"  style="display: none;"></div>
+                            <label class="label">
+                                <span class="label-text-alt">
+                                    <p>
+                                        <strong>Tip:</strong> Use <a target="newwindow" href="https://github.com/caronc/apprise" class="link link-hover">AppRise Notification URLs</a> for notification to just about any service! <i><a target="newwindow" href="https://github.com/dgtlmoon/changedetection.io/wiki/Notification-configuration-notes" class="link link-hover">Please read the notification services wiki here for important configuration notes</a></i>.
+                                    </p>
+                                    <button data-target="#advanced-help-notifications" class="toggle-show btn btn-xs btn-outline mt-2">Show advanced help and tips</button>
+                                    <ul style="display: none" id="advanced-help-notifications" class="list-disc pl-5 text-xs mt-1">
+                                        <li><code><a target="newwindow" href="https://github.com/caronc/apprise/wiki/Notify_discord" class="link link-hover">discord://</a></code> (or <code>https://discord.com/api/webhooks...</code>)) only supports a maximum <strong>2,000 characters</strong> of notification text, including the title.</li>
+                                        <li><code><a target="newwindow" href="https://github.com/caronc/apprise/wiki/Notify_telegram" class="link link-hover">tgram://</a></code> bots can't send messages to other bots, so you should specify chat ID of non-bot user.</li>
+                                        <li><code><a target="newwindow" href="https://github.com/caronc/apprise/wiki/Notify_telegram" class="link link-hover">tgram://</a></code> only supports very limited HTML and can fail when extra tags are sent, <a href="https://core.telegram.org/bots/api#html-style" class="link link-hover">read more here</a> (or use plaintext/markdown format)</li>
+                                        <li><code>gets://</code>, <code>posts://</code>, <code>puts://</code>, <code>deletes://</code> for direct API calls (or omit the "<code>s</code>" for non-SSL ie <code>get://</code>) <a href="https://github.com/dgtlmoon/changedetection.io/wiki/Notification-configuration-notes#postposts" class="link link-hover">more help here</a></li>
+                                        <li>Accepts the <code>{{ '{{token}}' }}</code> placeholders listed below</li>
+                                    </ul>
+                                </span>
+                            </label>
+                            <div class="notifications-wrapper mt-2 space-x-2">
+                              <a id="send-test-notification" class="btn btn-secondary btn-xs" >Send test notification</a> <div class="spinner"  style="display: none;"></div>
                             {% if emailprefix %}
-                              <a id="add-email-helper" class="pure-button button-secondary button-xsmall" >Add email <img style="height: 1em; display: inline-block" src="{{url_for('static_content', group='images', filename='email.svg')}}" alt="Add an email address"> </a>
+                              <a id="add-email-helper" class="btn btn-secondary btn-xs" >Add email <img style="height: 1em; display: inline-block; vertical-align: middle;" src="{{url_for('static_content', group='images', filename='email.svg')}}" alt="Add an email address"> </a>
                             {% endif %}
-                              <a href="{{url_for('settings.notification_logs')}}" class="pure-button button-secondary button-xsmall" >Notification debug logs</a>
-                              <br>
-                                <div id="notification-test-log" style="display: none;"><span class="pure-form-message-inline">Processing..</span></div>
+                              <a href="{{url_for('settings.notification_logs')}}" class="btn btn-secondary btn-xs" >Notification debug logs</a>
+                              <div id="notification-test-log" style="display: none;" class="text-xs text-gray-500 mt-1"><span>Processing..</span></div>
                             </div>
                         </div>
-                        <div id="notification-customisation" class="pure-control-group">
-                            <div class="pure-control-group">
-                                {{ render_field(form.notification_title, class="m-d notification-title", placeholder=settings_application['notification_title']) }}
-                                <span class="pure-form-message-inline">Title for all notifications</span>
+                        <div id="notification-customisation" class="space-y-4">
+                            <div class="form-control w-full">
+                                {{ render_field(form.notification_title, class="input input-bordered w-full notification-title", placeholder=settings_application['notification_title']) }}
+                                <label class="label">
+                                    <span class="label-text-alt">Title for all notifications</span>
+                                </label>
                             </div>
-                            <div class="pure-control-group">
-                                {{ render_field(form.notification_body , rows=5, class="notification-body", placeholder=settings_application['notification_body']) }}
-                                <span class="pure-form-message-inline">Body for all notifications &dash; You can use <a target="newwindow" href="https://jinja.palletsprojects.com/en/3.0.x/templates/">Jinja2</a> templating in the notification title, body and URL, and tokens from below.
-                                </span>
-
+                            <div class="form-control w-full">
+                                {{ render_field(form.notification_body , rows=5, class="textarea textarea-bordered w-full leading-normal notification-body", placeholder=settings_application['notification_body']) }}
+                                <label class="label">
+                                    <span class="label-text-alt">Body for all notifications &dash; You can use <a target="newwindow" href="https://jinja.palletsprojects.com/en/3.0.x/templates/" class="link link-hover">Jinja2</a> templating in the notification title, body and URL, and tokens from below.</span>
+                                </label>
                             </div>
-                            <div class="pure-controls">
-                                <div data-target="#notification-tokens-info" class="toggle-show pure-button button-tag button-xsmall">Show token/placeholders</div>
+                            <div>
+                                <button data-target="#notification-tokens-info" class="toggle-show btn btn-xs btn-outline">Show token/placeholders</button>
                             </div>
-                            <div class="pure-controls" style="display: none;" id="notification-tokens-info">
-                                <table class="pure-table" id="token-table">
+                            <div style="display: none;" id="notification-tokens-info" class="overflow-x-auto">
+                                <table class="table table-compact w-full text-xs" id="token-table">
                                     <thead>
                                     <tr>
-                                        <th>Token</th>
+                                        <th class="w-1/4">Token</th>
                                         <th>Description</th>
                                     </tr>
                                     </thead>
@@ -123,10 +126,10 @@
                                         {% endif %}
                                     </tbody>
                                 </table>
-                                <div class="pure-form-message-inline">
+                                <div class="text-xs text-gray-500 mt-2 space-y-1">
                                     <p>
 									Warning: Contents of <code>{{ '{{diff}}' }}</code>, <code>{{ '{{diff_removed}}' }}</code>, and <code>{{ '{{diff_added}}' }}</code> depend on how the difference algorithm perceives the change. <br>
-                                    For example, an addition or removal could be perceived as a change in some cases. <a target="newwindow" href="https://github.com/dgtlmoon/changedetection.io/wiki/Using-the-%7B%7Bdiff%7D%7D,-%7B%7Bdiff_added%7D%7D,-and-%7B%7Bdiff_removed%7D%7D-notification-tokens">More Here</a> <br>
+                                    For example, an addition or removal could be perceived as a change in some cases. <a target="newwindow" href="https://github.com/dgtlmoon/changedetection.io/wiki/Using-the-%7B%7Bdiff%7D%7D,-%7B%7Bdiff_added%7D%7D,-and-%7B%7Bdiff_removed%7D%7D-notification-tokens" class="link link-hover">More Here</a> <br>
                                     </p>
                                     <p>
                                         For JSON payloads, use <strong>|tojson</strong> without quotes for automatic escaping, for example - <code>{ "name": {{ '{{ watch_title|tojson }}' }} }</code>
@@ -136,9 +139,11 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="pure-control-group">
-                                {{ render_field(form.notification_format , class="notification-format") }}
-                                <span class="pure-form-message-inline">Format for all notifications</span>
+                            <div class="form-control w-full">
+                                {{ render_field(form.notification_format , class="select select-bordered w-full notification-format") }}
+                                <label class="label">
+                                    <span class="label-text-alt">Format for all notifications</span>
+                                </label>
                             </div>
                         </div>
 {% endmacro %}

@@ -1,187 +1,177 @@
-{% macro render_field(field) %}
-  <div {% if field.errors %} class="error" {% endif %}>{{ field.label }}</div>
-  <div {% if field.errors %} class="error" {% endif %}>{{ field(**kwargs)|safe }}
-  {% if field.errors %}
-    <ul class=errors>
-    {% for error in field.errors %}
-      <li>{{ error }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-  </div>
+{% macro render_field(field, required=False) %} {# Added required for asterisk #}
+<div class="form-control w-full {{ kwargs.pop('div_class', '') }}">
+    {% if field.label %}
+    <label class="label" for="{{ field.id }}">
+        <span class="label-text">{{ field.label.text }} {% if required %}*{% endif %}</span>
+    </label>
+    {% endif %}
+    {{ field(class_=kwargs.pop('class', 'input input-bordered w-full'), **kwargs)|safe }}
+    {% if field.errors %}
+        <label class="label">
+            <span class="label-text-alt text-error">{{ field.errors[0] }}</span>
+        </label>
+    {% elif field.description %}
+        {# Check if description is not empty string before rendering #}
+        {% if field.description|string|trim != "" %}
+        <label class="label">
+            <span class="label-text-alt">{{ field.description }}</span>
+        </label>
+        {% endif %}
+    {% endif %}
+</div>
 {% endmacro %}
 
-{% macro render_checkbox_field(field) %}
-  <div class="checkbox {% if field.errors %} error {% endif %}">
-  {{ field(**kwargs)|safe }} {{ field.label }}
-  {% if field.errors %}
-    <ul class=errors>
-    {% for error in field.errors %}
-      <li>{{ error }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-  </div>
+{% macro render_checkbox_field(field, required=False) %} {# Added required #}
+<div class="form-control {{ kwargs.pop('div_class', '') }}">
+  <label class="label cursor-pointer justify-start gap-2 py-1 {{ kwargs.pop('label_class', '') }}"> {# Reduced py-1 for checkboxes #}
+    {{ field(class_=kwargs.pop('class', 'checkbox'), **kwargs)|safe }}
+    <span class="label-text">{{ field.label.text }} {% if required %}*{% endif %}</span>
+  </label>
+    {% if field.errors %}
+        <label class="label pt-0"> {# pt-0 to keep it tight #}
+            <span class="label-text-alt text-error">{{ field.errors[0] }}</span>
+        </label>
+    {% elif field.description %}
+        {% if field.description|string|trim != "" %}
+        <label class="label pt-0">
+            <span class="label-text-alt text-xs">{{ field.description }}</span>
+        </label>
+        {% endif %}
+    {% endif %}
+</div>
 {% endmacro %}
 
 
 {% macro render_simple_field(field) %}
-  <span class="label {% if field.errors %}error{% endif %}">{{ field.label }}</span>
-  <span {% if field.errors %} class="error" {% endif %}>{{ field(**kwargs)|safe }}
-  {% if field.errors %}
-    <ul class=errors>
-    {% for error in field.errors %}
-      <li>{{ error }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
+  <span class="inline-flex items-center gap-1 {{ kwargs.pop('span_class', '') }}">
+    {% if field.label %}<span class="text-sm {{ kwargs.pop('label_class', '') }}">{{ field.label.text }}:</span>{% endif %}
+    {{ field(class_=kwargs.pop('class', 'input input-xs'), **kwargs)|safe }}
+    {% if field.errors %}
+        <span class="text-error text-xs">{{ field.errors[0] }}</span>
+    {% endif %}
   </span>
 {% endmacro %}
 
 
 {% macro render_nolabel_field(field) %}
-    <span>
-    {{ field(**kwargs)|safe }}
-        {% if field.errors %}
-            <span class="error">
-      {% if field.errors %}
-          <ul class=errors>
-        {% for error in field.errors %}
-            <li>{{ error }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-      </span>
-        {% endif %}
-    </span>
+<span class="{{ kwargs.pop('span_class', '') }}">
+    {{ field(class_=kwargs.pop('class', ''), **kwargs)|safe }}
+    {% if field.errors %}
+        <span class="text-error text-xs">{{ field.errors[0] }}</span>
+    {% endif %}
+</span>
 {% endmacro %}
 
 
-{% macro render_button(field) %}
-  {{ field(**kwargs)|safe }}
+{% macro render_button(field, text=None, name=None, value=None, type='submit', disabled=False) %}
+  <button type="{{ type }}" class="{{ kwargs.pop('class', 'btn') }}" {% if name %}name="{{name}}"{% endif %} {% if value %}value="{{value}}"{% endif %} {% if disabled %}disabled{% endif %} {{ kwargs|xmlattr }}>
+    {{ field.label.text if field and field.label else text }}
+  </button>
 {% endmacro %}
 
 {% macro render_conditions_fieldlist_of_formfields_as_table(fieldlist, table_id="rulesTable") %}
-  <div class="fieldlist_formfields" id="{{ table_id }}">
-    <div class="fieldlist-header">
-      {% for subfield in fieldlist[0] %}
-        <div class="fieldlist-header-cell">{{ subfield.label }}</div>
-      {% endfor %}
-      <div class="fieldlist-header-cell">Actions</div>
-    </div>
-    <div class="fieldlist-body">
-      {% for form_row in fieldlist %}
-        <div class="fieldlist-row {% if form_row.errors %}error-row{% endif %}">
-          {% for subfield in form_row %}
-            <div class="fieldlist-cell">
-
-              {{ subfield()|safe }}
-              {% if subfield.errors %}
-                <ul class="errors">
-                  {% for error in subfield.errors %}
-                    <li class="error">{{ error }}</li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-            </div>
-          {% endfor %}
-          <div class="fieldlist-cell fieldlist-actions">
-            <button type="button" class="addRuleRow" title="Add a row/rule after">+</button>
-            <button type="button" class="removeRuleRow" title="Remove this row/rule">-</button>
-            <button type="button" class="verifyRuleRow" title="Verify this rule against current snapshot">✓</button>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
+<div class="overflow-x-auto" id="{{ table_id }}">
+    <table class="table table-compact w-full">
+        <thead>
+            <tr>
+                {% for subfield in fieldlist[0] %}
+                    <th>{{ subfield.label.text }}</th>
+                {% endfor %}
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for form_row in fieldlist %}
+            <tr {% if form_row.errors %}class="error-row"{% endif %}> {# error-row might need specific styling or DaisyUI alert component integration #}
+                {% for subfield in form_row %}
+                <td class="p-1">
+                    {# Assuming subfield is a complete form field, render it with a minimal class if it's an input #}
+                    {% if subfield.type == 'StringField' or subfield.type == 'SelectField' %}
+                         {{ subfield(class="input input-bordered input-xs w-full " + subfield.render_kw.get('class', ''))|safe }}
+                    {% else %}
+                         {{ subfield()|safe }}
+                    {% endif %}
+                    {% if subfield.errors %}
+                    <ul class="text-error text-xs mt-1">
+                        {% for error in subfield.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </td>
+                {% endfor %}
+                <td class="p-1 whitespace-nowrap">
+                    <button type="button" class="btn btn-xs btn-ghost addRuleRow" title="Add a row/rule after">+</button>
+                    <button type="button" class="btn btn-xs btn-ghost removeRuleRow" title="Remove this row/rule">-</button>
+                    <button type="button" class="btn btn-xs btn-ghost verifyRuleRow" title="Verify this rule against current snapshot">✓</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endmacro %}
 
 
 {% macro playwright_warning() %}
-    <p><strong>Error - This watch needs Chrome (with playwright/sockpuppetbrowser), but Chrome based fetching is not enabled.</strong> Alternatively try our <a href="https://changedetection.io">very affordable subscription based service which has all this setup for you</a>.</p>
-    <p>You may need to <a href="https://github.com/dgtlmoon/changedetection.io/blob/09ebc6ec6338545bdd694dc6eee57f2e9d2b8075/docker-compose.yml#L31">Enable playwright environment variable</a> and uncomment the <strong>sockpuppetbrowser</strong> in the <a href="https://github.com/dgtlmoon/changedetection.io/blob/master/docker-compose.yml">docker-compose.yml</a> file.</p>
-    <br>
+<div role="alert" class="alert alert-warning">
+  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+  <span><strong>Error - This watch needs Chrome (with playwright/sockpuppetbrowser), but Chrome based fetching is not enabled.</strong> Alternatively try our <a href="https://changedetection.io" class="link">very affordable subscription based service which has all this setup for you</a>.
+   You may need to <a href="https://github.com/dgtlmoon/changedetection.io/blob/09ebc6ec6338545bdd694dc6eee57f2e9d2b8075/docker-compose.yml#L31" class="link">Enable playwright environment variable</a> and uncomment the <strong>sockpuppetbrowser</strong> in the <a href="https://github.com/dgtlmoon/changedetection.io/blob/master/docker-compose.yml" class="link">docker-compose.yml</a> file.
+  </span>
+</div>
 {% endmacro %}
 
 {% macro only_playwright_type_watches_warning() %}
-    <p><strong>Sorry, this functionality only works with Playwright/Chrome enabled watches.<br>You need to <a href="#request">Set the fetch method to Playwright/Chrome mode and resave</a> and have the SockpuppetBrowser/Playwright or Selenium enabled.</strong></p><br>
+<div role="alert" class="alert alert-info">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+  <span><strong>Sorry, this functionality only works with Playwright/Chrome enabled watches. You need to <a href="#request" class="link">Set the fetch method to Playwright/Chrome mode and resave</a> and have the SockpuppetBrowser/Playwright or Selenium enabled.</strong></span>
+</div>
 {% endmacro %}
 
 {% macro render_time_schedule_form(form, available_timezones, timezone_default_config) %}
-    <style>
-    .day-schedule *, .day-schedule select {
-        display: inline-block;
-    }
-
-    .day-schedule label[for*="time_schedule_limit-"][for$="-enabled"] {
-        min-width: 6rem;
-        font-weight: bold;
-    }
-    .day-schedule label {
-        font-weight: normal;
-    }
-
-    .day-schedule table label {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-    }
-    #timespan-warning, input[id*='time_schedule_limit-timezone'].error {
-        color: #ff0000;
-    }
-    .day-schedule.warning table {
-        background-color: #ffbbc2;
-    }
-    ul#day-wrapper {
-        list-style: none;
-    }
-    #timezone-info > * {
-        display: inline-block;
-    }
-
-    #scheduler-icon-label {
-        background-position: left center;
-        background-repeat: no-repeat;
-        background-size: contain;
-        display: inline-block;
-        vertical-align: middle;
-        padding-left: 50px;
-        background-image: url({{ url_for('static_content', group='images', filename='schedule.svg') }});
-    }
-    #timespan-warning {
-        display: none;
-    }
-    </style>
-    <br>
-
+    {# Remove old styles, apply Tailwind/DaisyUI as much as possible #}
+    <div class="my-4">
     {% if timezone_default_config %}
-    <div>
-        <span id="scheduler-icon-label" style="">
-            {{ render_checkbox_field(form.time_schedule_limit.enabled) }}
-            <div class="pure-form-message-inline">
-                Set a hourly/week day schedule
-            </div>
-        </span>
-
+    <div class="form-control">
+        <label id="scheduler-icon-label" class="label cursor-pointer justify-start gap-2 py-1 bg-no-repeat bg-left-center bg-contain pl-12" style="background-image: url({{ url_for('static_content', group='images', filename='schedule.svg') }});">
+            {{ form.time_schedule_limit.enabled(class="checkbox checkbox-primary") }}
+            <span class="label-text">Enable hourly/weekday schedule</span>
+        </label>
     </div>
-    <br>
-    <div id="schedule-day-limits-wrapper">
-        <label>Schedule time limits</label><a data-template="business-hours"
-                                              class="set-schedule pure-button button-secondary button-xsmall">Business
-        hours</a>
-        <a data-template="weekend" class="set-schedule pure-button button-secondary button-xsmall">Weekends</a>
-        <a data-template="reset" class="set-schedule pure-button button-xsmall">Reset</a><br>
-        <br>
 
-        <ul id="day-wrapper">
-            {% for day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
-                <li class="day-schedule" id="schedule-{{ day }}">
-                    {{ render_nolabel_field(form.time_schedule_limit[day]) }}
+    <div id="schedule-day-limits-wrapper" class="mt-4 space-y-3">
+        <div class="flex items-center gap-2">
+            <label class="font-semibold text-sm">Schedule time limits:</label>
+            <button data-template="business-hours" class="set-schedule btn btn-outline btn-xs">Business hours</button>
+            <button data-template="weekend" class="set-schedule btn btn-outline btn-xs">Weekends</button>
+            <button data-template="reset" class="set-schedule btn btn-outline btn-xs">Reset</button>
+        </div>
+
+        <ul id="day-wrapper" class="space-y-2 list-none p-0">
+            {% for day_key in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
+                {% set day_field = form.time_schedule_limit[day_key] %}
+                <li class="day-schedule p-2 rounded-md border border-base-300 {{ 'bg-error/20' if day_field.errors else '' }}" id="schedule-{{ day_key }}">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
+                        <label class="label-text font-semibold capitalize md:col-span-1" for="{{ day_field.enabled.id }}">{{ day_key }}</label>
+                        <div class="md:col-span-2 flex flex-wrap gap-2 items-center">
+                            {{ render_checkbox_field(day_field.enabled, div_class="w-auto", label_class="text-sm") }}
+                            {{ render_nolabel_field(day_field.start_time, class="input input-xs input-bordered w-24", span_class="flex items-center gap-1 text-sm", **{'aria-label': day_key + ' start time'}) }}
+                            <span class="text-sm">to</span>
+                            {{ render_nolabel_field(day_field.end_time, class="input input-xs input-bordered w-24", span_class="flex items-center gap-1 text-sm", **{'aria-label': day_key + ' end time'}) }}
+                             {% if day_field.errors %}
+                                <ul class="text-error text-xs col-span-full">
+                                {% for error in day_field.errors %}<li>{{ error }}</li>{% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
                 </li>
             {% endfor %}
-            <li id="timespan-warning">Warning, one or more of your 'days' has a duration that would extend into the next day.<br>
-            This could have unintended consequences.</li>
-            <li id="timezone-info">
-                {{ render_field(form.time_schedule_limit.timezone, placeholder=timezone_default_config) }} <span id="local-time-in-tz"></span>
+            <li id="timespan-warning" class="text-error text-sm" style="display: none;">Warning, one or more of your 'days' has a duration that would extend into the next day. This could have unintended consequences.</li>
+            <li id="timezone-info" class="form-control w-full max-w-xs mt-2">
+                {{ render_field(form.time_schedule_limit.timezone, placeholder=timezone_default_config, class="select select-bordered w-full", div_class="w-full") }}
+                <span id="local-time-in-tz" class="text-xs text-gray-500 mt-1"></span>
                 <datalist id="timezones" style="display: none;">
                     {% for timezone in available_timezones %}
                         <option value="{{ timezone }}">{{ timezone }}</option>
@@ -189,16 +179,14 @@
                 </datalist>
             </li>
         </ul>
-    <br>
-        <span class="pure-form-message-inline">
-         <a href="https://changedetection.io/tutorials">More help and examples about using the scheduler</a>
-        </span>
+        <p class="text-xs text-gray-500 mt-2">
+         <a href="https://changedetection.io/tutorials" class="link link-hover">More help and examples about using the scheduler</a>
+        </p>
     </div>
     {% else %}
-        <span class="pure-form-message-inline">
-            Want to use a time schedule? <a href="{{url_for('settings.settings_page')}}#timedate">First confirm/save your Time Zone Settings</a>
-        </span>
-        <br>
+        <p class="text-sm text-gray-500">
+            Want to use a time schedule? <a href="{{url_for('settings.settings_page')}}#timedate" class="link link-hover">First confirm/save your Time Zone Settings</a>
+        </p>
     {% endif %}
-
+    </div>
 {% endmacro %}

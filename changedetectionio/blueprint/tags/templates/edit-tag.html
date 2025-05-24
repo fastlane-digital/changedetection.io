@@ -8,93 +8,68 @@
 
 <script src="{{url_for('static_content', group='js', filename='tabs.js')}}" defer></script>
 <script>
-
-/*{% if emailprefix %}*/
-    /*const email_notification_prefix=JSON.parse('{{ emailprefix|tojson }}');*/
-/*{% endif %}*/
-
+/*{% if emailprefix %} const email_notification_prefix=JSON.parse('{{ emailprefix|tojson }}'); {% endif %}*/
 {% set has_tag_filters_extra='' %}
-
 </script>
 
 <script src="{{url_for('static_content', group='js', filename='watch-settings.js')}}" defer></script>
 <script src="{{url_for('static_content', group='js', filename='notifications.js')}}" defer></script>
 
-<div class="edit-form monospaced-textarea">
+<div class="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 monospaced-textarea">
 
-    <div class="tabs collapsable">
-        <ul>
-            <li class="tab" id=""><a href="#general">General</a></li>
-            <li class="tab"><a href="#filters-and-triggers">Filters &amp; Triggers</a></li>
-            {% if extra_tab_content %}
-            <li class="tab"><a href="#extras_tab">{{ extra_tab_content }}</a></li>
-            {% endif %}
-            <li class="tab"><a href="#notifications">Notifications</a></li>
-        </ul>
+    <div role="tablist" class="tabs tabs-lifted tabs-sm sm:tabs-md">
+        <a role="tab" class="tab tab-active" href="#general">General</a>
+        <a role="tab" class="tab" href="#filters-and-triggers">Filters &amp; Triggers</a>
+        {% if extra_tab_content %}
+        <a role="tab" class="tab" href="#extras_tab">{{ extra_tab_content }}</a>
+        {% endif %}
+        <a role="tab" class="tab" href="#notifications">Notifications</a>
     </div>
 
-    <div class="box-wrap inner">
-        <form class="pure-form pure-form-stacked"
-              action="{{ url_for('tags.form_tag_edit', uuid=data.uuid) }}" method="POST">
+    <div class="bg-base-100 p-4 sm:p-6 rounded-box shadow-xl mt-0 border border-base-300 border-t-0">
+        <form action="{{ url_for('tags.form_tag_edit', uuid=data.uuid) }}" method="POST" class="space-y-8">
              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-            <div class="tab-pane-inner" id="general">
-                <fieldset>
-                    <div class="pure-control-group">
-                        {{ render_field(form.title, placeholder="https://...", required=true, class="m-d") }}
-                    </div>
-                </fieldset>
+            <div class="tab-pane-inner p-4 pt-6 space-y-6" id="general">
+                {{ render_field(form.title, placeholder="Group Name", required=True, class="input input-bordered w-full") }}
             </div>
 
-            <div class="tab-pane-inner" id="filters-and-triggers">
-                <p>These settings are <strong><i>added</i></strong> to any existing watch configurations.</p>
+            <div class="tab-pane-inner p-4 pt-6 space-y-6" id="filters-and-triggers">
+                <p class="text-sm text-base-content/70 mb-4">These settings are <strong><i>added</i></strong> to any existing watch configurations for watches in this group.</p>
                 {% include "edit/include_subtract.html" %}
-                <div class="text-filtering border-fieldset">
-                    <h3>Text filtering</h3>
+                <div class="text-filtering border border-base-300 p-4 rounded-lg my-4 space-y-4">
+                    <h3 class="text-lg font-semibold">Text filtering</h3>
                     {% include "edit/text-options.html" %}
                 </div>
             </div>
 
-        {# rendered sub Template #}
-        {% if extra_form_content %}
-            <div class="tab-pane-inner" id="extras_tab">
-            {{ extra_form_content|safe }}
+            {% if extra_form_content %}
+            <div class="tab-pane-inner p-4 pt-6 space-y-6" id="extras_tab">
+                {{ extra_form_content|safe }}
             </div>
-        {% endif %}
-            <div class="tab-pane-inner" id="notifications">
-                <fieldset>
-                    <div  class="pure-control-group inline-radio">
-                      {{ render_checkbox_field(form.notification_muted) }}
-                    </div>
-                    {% if 1 %}
-                    <div class="pure-control-group inline-radio">
-                      {{ render_checkbox_field(form.notification_screenshot) }}
-                        <span class="pure-form-message-inline">
-                            <strong>Use with caution!</strong> This will easily fill up your email storage quota or flood other storages.
-                        </span>
+            {% endif %}
+
+            <div class="tab-pane-inner p-4 pt-6 space-y-6 relative" id="notifications"> {# Added relative for positioned button #}
+                {{ render_checkbox_field(form.notification_muted) }}
+                {{ render_checkbox_field(form.notification_screenshot, description_html='<strong>Use with caution!</strong> This will easily fill up your email storage quota or flood other storages.') }}
+                
+                <div class="field-group" id="notification-field-group">
+                    {% if has_default_notification_urls %}
+                    <div role="alert" class="alert alert-info text-sm mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>There are <a href="{{ url_for('settings.settings_page')}}#notifications" class="link link-hover">system-wide notification URLs enabled</a>. Settings here will override global settings for watches in this group. An empty Notification URL list here will still use global system notifications.</span>
                     </div>
                     {% endif %}
-                    <div class="field-group" id="notification-field-group">
-                        {% if has_default_notification_urls %}
-                        <div class="inline-warning">
-                            <img class="inline-warning-icon" src="{{url_for('static_content', group='images', filename='notice.svg')}}" alt="Look out!" title="Lookout!" >
-                            There are <a href="{{ url_for('settings.settings_page')}}#notifications">system-wide notification URLs enabled</a>, this form will override notification settings for this watch only &dash; an empty Notification URL list here will still send notifications.
-                        </div>
-                        {% endif %}
-                        <a href="#notifications" id="notification-setting-reset-to-default" class="pure-button button-xsmall" style="right: 20px; top: 20px; position: absolute; background-color: #5f42dd; border-radius: 4px; font-size: 70%; color: #fff">Use system defaults</a>
-
-                        {{ render_common_settings_form(form, emailprefix, settings_application, extra_notification_token_placeholder_info) }}
-                    </div>
-                </fieldset>
+                    <button type="button" id="notification-setting-reset-to-default" class="btn btn-accent btn-xs absolute top-4 right-4 normal-case">Use system defaults</button>
+                    {{ render_common_settings_form(form, emailprefix, settings_application, extra_notification_token_placeholder_info) }}
+                </div>
             </div>
 
-            <div id="actions">
-                <div class="pure-control-group">
-                    {{ render_button(form.save_button) }}
-                </div>
+            <div id="actions" class="flex flex-wrap gap-2 mt-8 pt-6 border-t border-base-300">
+                {{ render_button(form.save_button, class="btn btn-primary") }}
+                <a href="{{ url_for('tags.tags_overview_page') }}" class="btn btn-outline">Back to Groups</a>
             </div>
         </form>
     </div>
 </div>
-
 {% endblock %}
