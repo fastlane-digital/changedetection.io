@@ -13,92 +13,80 @@
     <script src="{{ url_for('static_content', group='js', filename='diff-overview.js') }}" defer></script>
     <script src="{{ url_for('static_content', group='js', filename='preview.js') }}" defer></script>
     <script src="{{ url_for('static_content', group='js', filename='tabs.js') }}" defer></script>
+    
     {% if versions|length >= 2 %}
-        <div id="settings" style="text-align: center;">
-            <form class="pure-form " action="" method="POST">
-                <fieldset>
-                    <label for="preview-version">Select timestamp</label> <select id="preview-version"
-                                                                                 name="from_version"
-                                                                                 class="needs-localtime">
-                    {% for version in versions|reverse %}
-                        <option value="{{ version }}" {% if version == current_version %} selected="" {% endif %}>
-                            {{ version }}
-                        </option>
-                    {% endfor %}
-                </select>
-                    <button type="submit" class="pure-button pure-button-primary">Go</button>
-
-                </fieldset>
+        <div id="settings" class="p-4 md:p-6 bg-base-200 rounded-box shadow mb-6 text-center">
+            <form action="" method="POST" class="inline-block">
+                <div class="form-control">
+                    <div class="input-group">
+                        <label for="preview-version" class="label"><span class="label-text mr-2">Select timestamp:</span></label> 
+                        <select id="preview-version" name="from_version" class="select select-sm select-bordered needs-localtime">
+                            {% for version in versions|reverse %}
+                                <option value="{{ version }}" {% if version == current_version %} selected {% endif %}>
+                                    {{ version }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Go</button>
+                    </div>
+                </div>
             </form>
-                <br>
-                <strong>Keyboard: </strong><a href="" class="pure-button pure-button-primary" id="btn-previous">
-                &larr; Previous</a> &nbsp; <a class="pure-button pure-button-primary" id="btn-next" href="">
-                &rarr; Next</a>
+            <div class="mt-3">
+                <span class="text-sm font-semibold">Keyboard: </span>
+                <a href="#" class="btn btn-sm btn-outline" id="btn-previous">&larr; Previous</a>
+                <a class="btn btn-sm btn-outline" id="btn-next" href="#">&rarr; Next</a>
+            </div>
         </div>
     {% endif %}
 
-    <div class="tabs">
-        <ul>
-            {% if last_error_text %}
-                <li class="tab" id="error-text-tab"><a href="#error-text">Error Text</a></li> {% endif %}
-            {% if last_error_screenshot %}
-                <li class="tab" id="error-screenshot-tab"><a href="#error-screenshot">Error Screenshot</a>
-                </li> {% endif %}
-            {% if history_n > 0 %}
-                <li class="tab" id="text-tab"><a href="#text">Text</a></li>
-                <li class="tab" id="screenshot-tab"><a href="#screenshot">Screenshot</a></li>
-            {% endif %}
-        </ul>
-    </div>
-
-
-    <div id="diff-ui">
-        <div class="tab-pane-inner" id="error-text">
-            <div class="snapshot-age error">{{ watch.error_text_ctime|format_seconds_ago }} seconds ago</div>
-            <pre>
-            {{ last_error_text }}
-        </pre>
-        </div>
-
-        <div class="tab-pane-inner" id="error-screenshot">
-            <div class="snapshot-age error">{{ watch.snapshot_error_screenshot_ctime|format_seconds_ago }} seconds ago
+    {# DaisyUI Tabs #}
+    <div role="tablist" class="tabs tabs-lifted tabs-lg mb-1">
+        {% if last_error_text %}
+            <input type="radio" name="preview_tabs" role="tab" class="tab" id="error-text-tab-radio" aria-label="Error Text" {% if last_error_text and not last_error_screenshot and not (history_n > 0) %}checked{% endif %} />
+            <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6" id="error-text">
+                <div class="badge badge-error badge-outline mb-2">{{ watch.error_text_ctime|format_seconds_ago }} seconds ago</div>
+                <pre class="bg-base-300 p-4 rounded-box text-sm whitespace-pre-wrap">{{ last_error_text }}</pre>
             </div>
-            <img id="error-screenshot-img" style="max-width: 80%"
-                 alt="Current erroring screenshot from most recent request">
-        </div>
+        {% endif %}
 
-        <div class="tab-pane-inner" id="text">
-            <div class="snapshot-age">{{ current_version|format_timestamp_timeago }}</div>
-            <span class="tip"><strong>Pro-tip</strong>: Highlight text to add to ignore filters</span>
-
-            <table>
-                <tbody>
-                <tr>
-                    <td id="diff-col" class="highlightable-filter">
-                        <pre style="border-left: 2px solid #ddd;">
-{{ content }}
-                        </pre>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="tab-pane-inner" id="screenshot">
-            <div class="tip">
-                For now, Differences are performed on text, not graphically, only the latest screenshot is available.
+        {% if last_error_screenshot %}
+            <input type="radio" name="preview_tabs" role="tab" class="tab" id="error-screenshot-tab-radio" aria-label="Error Screenshot" {% if last_error_screenshot and not last_error_text and not (history_n > 0) %}checked{% endif %}/>
+            <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6" id="error-screenshot">
+                <div class="badge badge-error badge-outline mb-2">{{ watch.snapshot_error_screenshot_ctime|format_seconds_ago }} seconds ago</div>
+                <img id="error-screenshot-img" style="max-width: 80%;" class="rounded-box shadow-md mx-auto" alt="Current erroring screenshot from most recent request">
             </div>
-            <br>
-            {% if is_html_webdriver %}
-                {% if screenshot %}
-                    <div class="snapshot-age">{{ watch.snapshot_screenshot_ctime|format_timestamp_timeago }}</div>
-                    <img style="max-width: 80%" id="screenshot-img" alt="Current screenshot from most recent request">
+        {% endif %}
+
+        {% if history_n > 0 %}
+            <input type="radio" name="preview_tabs" role="tab" class="tab" id="text-tab-radio" aria-label="Text" {% if not last_error_text and not last_error_screenshot %}checked{% endif %} />
+            <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6" id="text">
+                <div class="badge badge-outline mb-2">{{ current_version|format_timestamp_timeago }}</div>
+                <div class="alert alert-info text-sm mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span><strong>Pro-tip</strong>: Highlight text to add to ignore filters.</span>
+                </div>
+                <div id="diff-col" class="highlightable-filter">
+                    <pre class="p-2 border-l-2 border-base-300 bg-base-200 rounded-r-box text-sm whitespace-pre-wrap">{{ content }}</pre>
+                </div>
+            </div>
+
+            <input type="radio" name="preview_tabs" role="tab" class="tab" id="screenshot-tab-radio" aria-label="Screenshot" />
+            <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6" id="screenshot">
+                <div class="alert alert-info text-sm mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>For now, Differences are performed on text, not graphically, only the latest screenshot is available.</span>
+                </div>
+                {% if is_html_webdriver %}
+                    {% if screenshot %}
+                        <div class="badge badge-outline mb-2">{{ watch.snapshot_screenshot_ctime|format_timestamp_timeago }}</div>
+                        <img style="max-width: 80%;" id="screenshot-img" class="rounded-box shadow-md mx-auto" alt="Current screenshot from most recent request">
+                    {% else %}
+                        <p class="text-center font-semibold">No screenshot available just yet! Try rechecking the page.</p>
+                    {% endif %}
                 {% else %}
-                    No screenshot available just yet! Try rechecking the page.
+                    <p class="text-center font-semibold"><strong>Screenshot requires Playwright/WebDriver enabled.</strong></p>
                 {% endif %}
-            {% else %}
-                <strong>Screenshot requires Playwright/WebDriver enabled</strong>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

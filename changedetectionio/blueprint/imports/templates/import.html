@@ -2,122 +2,135 @@
 {% block content %}
 {% from '_helpers.html' import render_field %}
 <script src="{{url_for('static_content', group='js', filename='tabs.js')}}" defer></script>
-<div class="edit-form monospaced-textarea">
 
-    <div class="tabs collapsable">
-        <ul>
-            <li class="tab" id=""><a href="#url-list">URL List</a></li>
-            <li class="tab"><a href="#distill-io">Distill.io</a></li>
-            <li class="tab"><a href="#xlsx">.XLSX &amp; Wachete</a></li>
-        </ul>
+<div class="edit-form monospaced-textarea p-4 md:p-6">
+    {# DaisyUI Tabs #}
+    <div role="tablist" class="tabs tabs-lifted tabs-lg mb-6">
+        <input type="radio" name="import_tabs" role="tab" class="tab" id="url-list-tab-radio" aria-label="URL List" checked />
+        <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6" id="url-list">
+            {# Content for URL List tab - Will be injected by JS #}
+        </div>
+
+        <input type="radio" name="import_tabs" role="tab" class="tab" id="distill-io-tab-radio" aria-label="Distill.io" />
+        <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6" id="distill-io">
+            {# Content for Distill.io tab - Will be injected by JS #}
+        </div>
+
+        <input type="radio" name="import_tabs" role="tab" class="tab" id="xlsx-tab-radio" aria-label=".XLSX & Wachete" />
+        <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6" id="xlsx">
+            {# Content for .XLSX tab - Will be injected by JS #}
+        </div>
     </div>
 
-    <div class="box-wrap inner">
-        <form class="pure-form" action="{{url_for('imports.import_page')}}" method="POST" enctype="multipart/form-data">
+    <div class="box-wrap inner"> {# This div might be redundant if tab panels handle their own background/padding #}
+        <form action="{{url_for('imports.import_page')}}" method="POST" enctype="multipart/form-data" class="space-y-6">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="tab-pane-inner" id="url-list">
-                <div class="pure-control-group">
-                        Enter one URL per line, and optionally add tags for each URL after a space, delineated by comma
-                        (,):
-                        <br>
-                        <p><strong>Example:  </strong><code>https://example.com tag1, tag2, last tag</code></p>
-                        URLs which do not pass validation will stay in the textarea.
+            
+            {# Placeholder for tab contents - real content will be injected by JS #}
+            <div id="actual-url-list-content" style="display:none;">
+                <div class="form-control space-y-2">
+                    <p class="text-sm">Enter one URL per line, and optionally add tags for each URL after a space, delineated by comma (,):</p>
+                    <p class="text-sm"><strong>Example: </strong><code>https://example.com tag1, tag2, last tag</code></p>
+                    <p class="text-xs text-base-content text-opacity-70">URLs which do not pass validation will stay in the textarea.</p>
                 </div>
-                {{ render_field(form.processor, class="processor") }}
-                
-                <div class="pure-control-group">
-                    <textarea name="urls" class="pure-input-1-2" placeholder="https://"
-                              style="width: 100%;
-                                font-family:monospace;
-                                white-space: pre;
-                                overflow-wrap: normal;
-                                overflow-x: scroll;" rows="25">{{ import_url_list_remaining }}</textarea>
-                 </div>
-                 <div id="quick-watch-processor-type"></div>
-
+                <div class="form-control w-full md:w-1/2">
+                    {{ render_field(form.processor, class="select select-bordered select-sm processor", label_class="label-text") }}
+                </div>
+                <div class="form-control">
+                    <textarea name="urls" class="textarea textarea-bordered w-full text-sm font-mono" placeholder="https://" rows="15">{{ import_url_list_remaining }}</textarea>
+                </div>
+                <div id="quick-watch-processor-type"></div>
             </div>
 
-            <div class="tab-pane-inner" id="distill-io">
+            <div id="actual-distill-io-content" style="display:none;">
+                <div class="form-control space-y-2">
+                    <p class="text-sm">Copy and Paste your Distill.io watch 'export' file, this should be a JSON file.</p>
+                    <p class="text-xs text-base-content text-opacity-70">This is <i>experimental</i>, supported fields are <code>name</code>, <code>uri</code>, <code>tags</code>, <code>config:selections</code>, the rest (including <code>schedule</code>) are ignored.</p>
+                    <p class="text-sm">How to export? <a href="https://distill.io/docs/web-monitor/how-export-and-import-monitors/" class="link link-hover" target="_blank">https://distill.io/docs/web-monitor/how-export-and-import-monitors/</a></p>
+                    <p class="text-xs text-base-content text-opacity-70">Be sure to set your default fetcher to Chrome if required.</p>
+                </div>
+                <div class="form-control">
+                    <textarea name="distill-io" class="textarea textarea-bordered w-full text-sm font-mono" rows="15" placeholder="Example Distill.io JSON export file...">{{ original_distill_json }}</textarea>
+                </div>
+            </div>
 
-
-
-                    <div class="pure-control-group">
-                        Copy and Paste your Distill.io watch 'export' file, this should be a JSON file.<br>
-                        This is <i>experimental</i>, supported fields are <code>name</code>, <code>uri</code>, <code>tags</code>, <code>config:selections</code>, the rest (including <code>schedule</code>) are ignored.
-                        <br>
-                        <p>
-                        How to export? <a href="https://distill.io/docs/web-monitor/how-export-and-import-monitors/">https://distill.io/docs/web-monitor/how-export-and-import-monitors/</a><br>
-                        Be sure to set your default fetcher to Chrome if required.<br>
-                        </p>
+            <div id="actual-xlsx-content" style="display:none;">
+                <fieldset class="space-y-4">
+                    <div class="form-control w-full md:w-1/2">
+                        {{ render_field(form.xlsx_file, class="file-input file-input-bordered file-input-sm w-full", label_class="label-text") }}
                     </div>
-
-
-                    <textarea name="distill-io" class="pure-input-1-2" style="width: 100%;
-                                font-family:monospace;
-                                white-space: pre;
-                                overflow-wrap: normal;
-                                overflow-x: scroll;" placeholder="Example Distill.io JSON export file
-
-{
-    &quot;client&quot;: {
-        &quot;local&quot;: 1
-    },
-    &quot;data&quot;: [
-        {
-            &quot;name&quot;: &quot;Unraid | News&quot;,
-            &quot;uri&quot;: &quot;https://unraid.net/blog&quot;,
-            &quot;config&quot;: &quot;{\&quot;selections\&quot;:[{\&quot;frames\&quot;:[{\&quot;index\&quot;:0,\&quot;excludes\&quot;:[],\&quot;includes\&quot;:[{\&quot;type\&quot;:\&quot;xpath\&quot;,\&quot;expr\&quot;:\&quot;(//div[@id='App']/div[contains(@class,'flex')]/main[contains(@class,'relative')]/section[contains(@class,'relative')]/div[@class='container']/div[contains(@class,'flex')]/div[contains(@class,'w-full')])[1]\&quot;}]}],\&quot;dynamic\&quot;:true,\&quot;delay\&quot;:2}],\&quot;ignoreEmptyText\&quot;:true,\&quot;includeStyle\&quot;:false,\&quot;dataAttr\&quot;:\&quot;text\&quot;}&quot;,
-            &quot;tags&quot;: [],
-            &quot;content_type&quot;: 2,
-            &quot;state&quot;: 40,
-            &quot;schedule&quot;: &quot;{\&quot;type\&quot;:\&quot;INTERVAL\&quot;,\&quot;params\&quot;:{\&quot;interval\&quot;:4447}}&quot;,
-            &quot;ts&quot;: &quot;2022-03-27T15:51:15.667Z&quot;
-        }
-    ]
-}
-" rows="25">{{ original_distill_json }}</textarea>
-
-            </div>
-            <div class="tab-pane-inner" id="xlsx">
-            <fieldset>
-                <div class="pure-control-group">
-                {{ render_field(form.xlsx_file, class="processor") }}
-                </div>
-                <div class="pure-control-group">
-                    {{ render_field(form.file_mapping, class="processor") }}
-                </div>
-            </fieldset>
-                <div class="pure-control-group">
-                <span class="pure-form-message-inline">
-                    Table of custom column and data types mapping for the <strong>Custom mapping</strong> File mapping type.
-                </span>
-                    <table style="border: 1px solid #aaa; padding: 0.5rem; border-radius: 4px;">
-                        <tr>
-                            <td><strong>Column #</strong></td>
-                            {% for n in range(4) %}
-                                <td><input type="number" name="custom_xlsx[col_{{n}}]" style="width: 4rem;" min="1"></td>
-                            {%  endfor %}
-                        </tr>
-                        <tr>
-                            <td><strong>Type</strong></td>
-                            {% for n in range(4) %}
-                                <td><select name="custom_xlsx[col_type_{{n}}]">
-                                    <option value="" style="color: #aaa"> -- none --</option>
-                                    <option value="url">URL</option>
-                                    <option value="title">Title</option>
-                                    <option value="include_filters">CSS/xPath filter</option>
-                                    <option value="tag">Group / Tag name(s)</option>
-                                    <option value="interval_minutes">Recheck time (minutes)</option>
-                                </select></td>
-                            {%  endfor %}
-                        </tr>
-                    </table>
+                    <div class="form-control w-full md:w-1/2">
+                        {{ render_field(form.file_mapping, class="select select-bordered select-sm w-full", label_class="label-text") }}
+                    </div>
+                </fieldset>
+                <div class="form-control mt-4">
+                    <p class="text-sm mb-2">Table of custom column and data types mapping for the <strong>Custom mapping</strong> File mapping type.</p>
+                    <div class="overflow-x-auto">
+                        <table class="table table-compact w-full table-zebra border border-base-300 rounded-md">
+                            <thead>
+                                <tr>
+                                    <th>Column #</th>
+                                    {% for n in range(4) %}
+                                        <th>Mapping {{ n + 1 }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold">Column Number</td>
+                                    {% for n in range(4) %}
+                                        <td><input type="number" name="custom_xlsx[col_{{n}}]" class="input input-xs input-bordered w-20" min="1"></td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Data Type</td>
+                                    {% for n in range(4) %}
+                                        <td>
+                                            <select name="custom_xlsx[col_type_{{n}}]" class="select select-xs select-bordered w-full max-w-xs">
+                                                <option value="" disabled selected>-- none --</option>
+                                                <option value="url">URL</option>
+                                                <option value="title">Title</option>
+                                                <option value="include_filters">CSS/xPath filter</option>
+                                                <option value="tag">Group / Tag name(s)</option>
+                                                <option value="interval_minutes">Recheck time (minutes)</option>
+                                            </select>
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            <button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Import</button>
+            
+            <div class="mt-6">
+                <button type="submit" class="btn btn-primary w-full md:w-auto">Import</button>
+            </div>
         </form>
-
     </div>
 </div>
 
+<script>
+    function initImportTabs() {
+        const urlListContent = document.getElementById('actual-url-list-content').innerHTML;
+        document.getElementById('url-list').innerHTML = urlListContent;
+
+        const distillIoContent = document.getElementById('actual-distill-io-content').innerHTML;
+        document.getElementById('distill-io').innerHTML = distillIoContent;
+        
+        const xlsxContent = document.getElementById('actual-xlsx-content').innerHTML;
+        document.getElementById('xlsx').innerHTML = xlsxContent;
+
+        // Clean up placeholder divs if necessary, though they are already display:none
+        // document.getElementById('actual-url-list-content').remove();
+        // document.getElementById('actual-distill-io-content').remove();
+        // document.getElementById('actual-xlsx-content').remove();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initImportTabs);
+    } else {
+        initImportTabs();
+    }
+</script>
 {% endblock %}

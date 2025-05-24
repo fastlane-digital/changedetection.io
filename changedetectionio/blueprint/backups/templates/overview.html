@@ -1,36 +1,65 @@
 {% extends 'base.html' %}
 {% block content %}
     {% from '_helpers.html' import render_simple_field, render_field %}
-    <div class="edit-form">
-        <div class="box-wrap inner">
-            <h4>Backups</h4>
+    <div class="edit-form p-4 md:p-6">
+        <div class="box-wrap inner bg-base-100 p-6 rounded-box shadow-xl">
+            <h2 class="text-2xl font-semibold mb-4">Backups</h2>
+            
             {% if backup_running %}
-                <p>
-                    <strong>A backup is running!</strong>
-                </p>
+                <div class="alert alert-info shadow-lg mb-4">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>A backup is currently running! Please wait for it to complete.</span>
+                    </div>
+                </div>
             {% endif %}
-            <p>
-                Here you can download and request a new backup, when a backup is completed you will see it listed below.
+            
+            <p class="text-sm mb-6">
+                Here you can download and request a new backup. When a backup is completed, you will see it listed below.
             </p>
-            <br>
-                {% if available_backups %}
-                    <ul>
-                    {% for backup in available_backups %}
-                        <li><a href="{{ url_for('backups.download_backup', filename=backup["filename"]) }}">{{ backup["filename"] }}</a> {{  backup["filesize"] }} Mb</li>
-                    {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>
-                    <strong>No backups found.</strong>
-                    </p>
-                {% endif %}
 
-            <a class="pure-button pure-button-primary" href="{{ url_for('backups.request_backup') }}">Create backup</a>
             {% if available_backups %}
-                <a class="pure-button button-small button-error " href="{{ url_for('backups.remove_backups') }}">Remove backups</a>
+                <div class="overflow-x-auto shadow-md rounded-lg mb-6">
+                    <table class="table table-zebra w-full">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th class="text-right">Size</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for backup in available_backups %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('backups.download_backup', filename=backup['filename']) }}" class="link link-hover link-primary">
+                                        {{ backup["filename"] }}
+                                    </a>
+                                </td>
+                                <td class="text-right">{{ backup["filesize"] }} Mb</td>
+                                <td class="text-right">
+                                     <a href="{{ url_for('backups.download_backup', filename=backup['filename']) }}" class="btn btn-xs btn-outline">Download</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-warning shadow-lg mb-6">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <span>No backups found.</span>
+                    </div>
+                </div>
             {% endif %}
+
+            <div class="flex flex-wrap gap-2">
+                <a class="btn btn-primary" href="{{ url_for('backups.request_backup') }}">Create new backup</a>
+                {% if available_backups %}
+                    <a class="btn btn-error btn-outline" href="{{ url_for('backups.remove_backups') }}">Remove all backups</a>
+                {% endif %}
+            </div>
         </div>
     </div>
-
-
 {% endblock %}

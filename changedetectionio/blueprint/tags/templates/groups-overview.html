@@ -3,55 +3,52 @@
 {% from '_helpers.html' import render_simple_field, render_field %}
 <script src="{{url_for('static_content', group='js', filename='jquery-3.6.0.min.js')}}"></script>
 
-<div class="box">
-    <form class="pure-form" action="{{ url_for('tags.form_tag_add') }}" method="POST" id="new-watch-form">
+<div class="box p-4 md:p-6">
+    <form action="{{ url_for('tags.form_tag_add') }}" method="POST" id="new-tag-form" class="mb-6 p-4 border rounded-lg shadow-sm bg-base-100">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" >
-        <fieldset>
-            <legend>Add a new organisational tag</legend>
-            <div id="watch-add-wrapper-zone">
-                <div>
-                    {{ render_simple_field(form.name, placeholder="watch label / tag") }}
+        <fieldset class="space-y-4">
+            <legend class="text-xl font-semibold mb-3">Add a new organisational group/tag</legend>
+            <div id="tag-add-wrapper-zone" class="flex flex-wrap items-end gap-3">
+                <div class="form-control flex-grow">
+                    {{ render_simple_field(form.name, placeholder="Group/Tag name", class="input input-bordered w-full", label_class="label-text") }}
                 </div>
-                <div>
-                    {{ render_simple_field(form.save_button, title="Save" ) }}
+                <div class="form-control">
+                    {{ render_simple_field(form.save_button, title="Save", class="btn btn-primary") }}
                 </div>
             </div>
-            <br>
-            <div style="color: #fff;">Groups allows you to manage filters and notifications for multiple watches under a single organisational tag.</div>
+            <p class="text-xs text-base-content text-opacity-70 mt-2">Groups allows you to manage filters and notifications for multiple watches under a single organisational tag.</p>
         </fieldset>
     </form>
-    <!-- @todo maybe some overview matrix, 'tick' with which has notification, filter rules etc -->
-    <div id="watch-table-wrapper">
 
-        <table class="pure-table pure-table-striped watch-table group-overview-table">
+    <div id="watch-table-wrapper" class="overflow-x-auto shadow-md rounded-lg">
+        <table class="table table-zebra w-full">
             <thead>
-            <tr>
-                <th></th>
-                <th># Watches</th>
-                <th>Tag / Label name</th>
-                <th></th>
-            </tr>
+                <tr>
+                    <th class="w-12">Mute</th>
+                    <th># Watches</th>
+                    <th>Tag / Label name</th>
+                    <th class="text-right">Actions</th>
+                </tr>
             </thead>
             <tbody>
-            <!--
-            @Todo - connect Last checked, Last Changed, Number of Watches etc
-            --->
             {% if not available_tags|length %}
-            <tr>
-                <td colspan="3">No website organisational tags/groups configured</td>
-            </tr>
+                <tr>
+                    <td colspan="4" class="text-center p-4">No website organisational tags/groups configured.</td>
+                </tr>
             {% endif %}
-            {% for uuid, tag in available_tags  %}
-            <tr id="{{ uuid }}" class="{{ loop.cycle('pure-table-odd', 'pure-table-even') }}">
+            {% for uuid, tag_item in available_tags  %} {# Renamed tag to tag_item #}
+            <tr id="{{ uuid }}">
                 <td class="watch-controls">
-                    <a class="link-mute state-{{'on' if tag.notification_muted else 'off'}}" href="{{url_for('tags.mute', uuid=tag.uuid)}}"><img src="{{url_for('static_content', group='images', filename='bell-off.svg')}}" alt="Mute notifications" title="Mute notifications" class="icon icon-mute" ></a>
+                    <a class="btn btn-ghost btn-xs p-1" href="{{url_for('tags.mute', uuid=tag_item.uuid)}}" title="{{'Unmute' if tag_item.notification_muted else 'Mute'}} notifications">
+                        <img src="{{url_for('static_content', group='images', filename='bell-off.svg')}}" alt="Mute/Unmute" class="h-4 w-4 {{ '' if tag_item.notification_muted else 'opacity-30' }}" >
+                    </a>
                 </td>
                 <td>{{ "{:,}".format(tag_count[uuid]) if uuid in tag_count else 0 }}</td>
-                <td class="title-col inline"> <a href="{{url_for('watchlist.index', tag=uuid) }}">{{ tag.title }}</a></td>
-                <td>
-                    <a class="pure-button pure-button-primary" href="{{ url_for('tags.form_tag_edit', uuid=uuid) }}">Edit</a>&nbsp;
-                    <a class="pure-button pure-button-primary" href="{{ url_for('tags.delete', uuid=uuid) }}" title="Deletes and removes tag">Delete</a>
-                    <a class="pure-button pure-button-primary" href="{{ url_for('tags.unlink', uuid=uuid) }}" title="Keep the tag but unlink any watches">Unlink</a>
+                <td class="title-col"> <a href="{{url_for('watchlist.index', tag=uuid) }}" class="link link-hover">{{ tag_item.title }}</a></td>
+                <td class="text-right space-x-1">
+                    <a class="btn btn-sm btn-outline" href="{{ url_for('tags.form_tag_edit', uuid=uuid) }}">Edit</a>
+                    <a class="btn btn-sm btn-error btn-outline" href="{{ url_for('tags.delete', uuid=uuid) }}" title="Deletes and removes tag">Delete</a>
+                    <a class="btn btn-sm btn-warning btn-outline" href="{{ url_for('tags.unlink', uuid=uuid) }}" title="Keep the tag but unlink any watches">Unlink</a>
                 </td>
             </tr>
             {% endfor %}
