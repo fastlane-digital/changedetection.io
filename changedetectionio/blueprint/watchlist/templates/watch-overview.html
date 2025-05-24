@@ -240,7 +240,7 @@
                 <a href="{{url_for('ui.mark_all_viewed',with_errors=request.args.get('with_errors',0)) }}" class="btn btn-sm btn-info">Mark all viewed</a>
             {% endif %}
             <a href="{{ url_for('ui.form_watch_checknow', tag=active_tag_uuid, with_errors=request.args.get('with_errors',0)) }}" class="btn btn-sm btn-accent">Recheck
-                all {% if active_tag_uuid %} in "{{active_tag_item.title}}"{%endif%}</a> {# Changed active_tag to active_tag_item #}
+                all {% if active_tag_uuid %} in "{{active_tag.title}}"{%endif%}</a>
             <a href="{{ url_for('rss.feed', tag=active_tag_uuid, token=app_rss_token)}}" class="btn btn-sm btn-ghost">
                 <img alt="RSS Feed" id="feed-icon" src="{{url_for('static_content', group='images', filename='generic_feed-icon.svg')}}" class="h-4 w-4">
                 <span class="ml-1">RSS</span>
