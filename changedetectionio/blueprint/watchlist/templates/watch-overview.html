@@ -125,17 +125,23 @@
             {% for watch in (watches|sort(attribute=sort_attribute, reverse=sort_order == 'asc'))|pagination_slice(skip=pagination.skip) %}
                 {% set is_unviewed = watch.newest_history_key| int > watch.last_viewed and watch.history_n>=2 %}
                 {% set checking_now = is_checking_now(watch) %}
-                {# Base classes for the row #}
-                {% set row_classes = ['processor-' ~ watch['processor']] %}
-                {% if watch.last_error is defined and watch.last_error != False %}{% do row_classes.append('row-error bg-error bg-opacity-20') %}{% endif %}
-                {% if watch.last_notification_error is defined and watch.last_notification_error != False %}{% do row_classes.append('row-warning bg-warning bg-opacity-20') %}{% endif %}
-                {% if watch.paused is defined and watch.paused != False %}{% do row_classes.append('opacity-60') %}{% endif %}
-                {% if is_unviewed %}{% do row_classes.append('font-semibold text-accent-content bg-accent bg-opacity-10') %}{% endif %}
-                {% if watch.has_restock_info %} {% do row_classes.append('has-restock-info') %} {% if watch['restock']['in_stock'] %}{% do row_classes.append('in-stock') %}{% else %}{% do row_classes.append('not-in-stock') %}{% endif %} {% else %} {% do row_classes.append('no-restock-info') %} {% endif %}
-                {% if watch.uuid in queued_uuids %}{% do row_classes.append('opacity-70 italic') %}{% endif %}
-                {% if checking_now %}{% do row_classes.append('checking-now') %}{% endif %}
+                {# Refactored row class construction #}
+                {% set base_class = 'processor-' ~ watch['processor'] %}
+                {% set error_class = ' row-error bg-error bg-opacity-20' if watch.last_error is defined and watch.last_error != False else '' %}
+                {% set warning_class = ' row-warning bg-warning bg-opacity-20' if watch.last_notification_error is defined and watch.last_notification_error != False else '' %}
+                {% set paused_class = ' opacity-60' if watch.paused is defined and watch.paused != False else '' %}
+                {% set unviewed_class = ' font-semibold text-accent-content bg-accent bg-opacity-10' if is_unviewed else '' %}
+                {% set restock_info_class = ' has-restock-info' if watch.has_restock_info else ' no-restock-info' %}
+                {% set stock_status_class = '' %}
+                {% if watch.has_restock_info %}
+                    {% set stock_status_class = ' in-stock' if watch['restock']['in_stock'] else ' not-in-stock' %}
+                {% endif %}
+                {% set queued_class = ' opacity-70 italic' if watch.uuid in queued_uuids else '' %}
+                {% set checking_now_class = ' checking-now' if checking_now else '' %}
 
-            <tr id="{{ watch.uuid }}" class="{{ row_classes|join(' ') }}">
+                {% set row_classes = base_class ~ error_class ~ warning_class ~ paused_class ~ unviewed_class ~ restock_info_class ~ stock_status_class ~ queued_class ~ checking_now_class %}
+
+            <tr id="{{ watch.uuid }}" class="{{ row_classes|trim }}">
                 <td class="align-middle"><input name="uuids" type="checkbox" value="{{ watch.uuid}}" class="checkbox checkbox-xs" /> <span class="ml-2 text-xs">{{ loop.index+pagination.skip }}</span></td>
                 <td class="watch-controls space-x-1 align-middle">
                     <a class="btn btn-xs btn-ghost p-0" href="{{url_for('watchlist.index', op='pause', uuid=watch.uuid, tag=active_tag_uuid)}}" title="{{ 'UnPause checks' if watch.paused else 'Pause checks' }}">
