@@ -39,22 +39,16 @@
       <div class="navbar-start">
         {% if has_password and not current_user.is_authenticated %}
           <a class="btn btn-ghost normal-case text-xl" href="https://changedetection.io" rel="noopener">
-            <strong>Change</strong>Detection.io</a>
+            <strong>Fast</strong>Monitor</a>
         {% else %}
           <a class="btn btn-ghost normal-case text-xl" href="{{url_for('watchlist.index')}}">
-            <strong>Change</strong>Detection.io</a>
+            <strong>Fast</strong>Monitor</a>
         {% endif %}
       </div>
       <div class="navbar-center">
         {% if current_diff_url %}
           <a class="text-sm hidden md:inline-block" href="{{ current_diff_url }}">
             <span class="max-w-xs truncate">{{ current_diff_url }}</span></a>
-        {% else %}
-          {% if new_version_available and not(has_password and not current_user.is_authenticated) %}
-            <span id="new-version-text" class="text-info">
-              <a href="https://changedetection.io">A new version is available</a>
-            </span>
-          {% endif %}
         {% endif %}
       </div>
       <div class="navbar-end">
@@ -68,8 +62,6 @@
             {% else %}
               <li><a href="{{ url_for('ui.ui_edit.edit_page', uuid=uuid, next='diff') }}">EDIT</a></li>
             {% endif %}
-          {% else %}
-            <li><a href="https://changedetection.io">Website Change Detection and Notification.</a></li>
           {% endif %}
           {% if current_user.is_authenticated %}
             <li><a href="{{url_for('logout')}}">LOG OUT</a></li>
@@ -111,11 +103,6 @@
                      style="fill:var(--color-background);fill-opacity:1;stroke:#ff0000;stroke-opacity:1" />
                 </svg>
           </li>
-          <li>
-            <a class="btn btn-ghost btn-circle" href="https://github.com/dgtlmoon/changedetection.io">
-              {% include "svgs/github.svg" %}
-            </a>
-          </li>
         </ul>
       </div>
     </div>
@@ -132,58 +119,7 @@
           Visualise <strong>triggers</strong> and <strong>ignored text</strong>
       </div>
     {% endif %}
-    {% if right_sticky %}
-      <div class="sticky-tab bg-base-200 p-3 shadow-lg rounded-lg text-sm" id="right-sticky">{{ right_sticky }}</div>
-    {% endif %}
     <section class="container mx-auto px-4">
-        <div id="overlay">
-            <div class="prose lg:prose-xl p-8 bg-base-200 rounded-box shadow-xl">
-                <h4 class="text-2xl font-bold">Try our Chrome extension</h4>
-                <p>
-                    <a id="chrome-extension-link"
-                       title="Chrome Extension - Web Page Change Detection with changedetection.io!"
-                       href="https://chromewebstore.google.com/detail/changedetectionio-website/kefcfmgmlhmankjmnbijimhofdjekbop">
-                        <img alt="Chrome store icon" src="{{url_for('static_content', group='images', filename='google-chrome-icon.png')}}" class="inline-block h-8 w-8 mr-2">
-                        Chrome Webstore
-                    </a>
-                </p>
-                <p>Easily add the current web-page from your browser directly into your changedetection.io tool, more great features coming soon!</p>
-                <h4 class="text-2xl font-bold">Changedetection.io needs your support!</h4>
-                <p>
-                    You can help us by supporting changedetection.io on these platforms;
-                </p>
-                <ul class="list-disc pl-5">
-                    <li>
-                        <a href="https://alternativeto.net/software/changedetection-io/about/" title="Web page change detection at alternativeto.net" class="link link-hover">Rate us at
-                        AlternativeTo.net</a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/dgtlmoon/changedetection.io" title="Web page change detection on GitHub" class="link link-hover">Star us on GitHub</a>
-                    </li>
-                    <li>
-                        <a rel="nofollow" href="https://twitter.com/change_det_io" title="Web page change detection on Twitter" class="link link-hover">Follow us at Twitter/X</a>
-                    </li>
-                    <li>
-                        <a rel="nofollow" href="https://www.g2.com/products/changedetection-io/reviews" title="Web page change detection reviews at G2" class="link link-hover">G2 Software reviews</a>
-                    </li>
-                    <li>
-                        <a rel="nofollow" href="https://www.linkedin.com/company/changedetection-io" title="Visit web page change detection at LinkedIn" class="link link-hover">Check us out on LinkedIn</a>
-                    </li>
-                    <li>
-                        And tell your friends and colleagues :)
-                    </li>
-                </ul>
-                <p>
-                    The more popular changedetection.io is, the more time we can dedicate to adding amazing features!
-                </p>
-                <p>
-                    Many thanks :)<br>
-                </p>
-                <p>
-                    <i>changedetection.io team</i>
-                </p>
-            </div>
-        </div>
         <header>
         {% block header %}{% endblock %}
       </header>

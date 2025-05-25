@@ -1,6 +1,8 @@
 services:
     changedetection:
-      image: ghcr.io/dgtlmoon/changedetection.io
+      build: . # 从本地 Dockerfile 构建镜像
+      # image: ghcr.io/dgtlmoon/changedetection.io # 注释掉此行，不再使用预构建镜像
+      image: changedetection.daisy2
       container_name: changedetection
       hostname: changedetection
       volumes:
