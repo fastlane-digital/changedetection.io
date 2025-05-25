@@ -1,0 +1,605 @@
+/*
+ * -- BASE STYLES --
+ */
+.arrow {
+  border: solid #1b98f8;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 3px; }
+  .arrow.right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg); }
+  .arrow.left {
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg); }
+  .arrow.up, .arrow.asc {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg); }
+  .arrow.down, .arrow.desc {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg); }
+
+#browser_steps {
+  /* convert rows to horizontal cells */ }
+  #browser_steps th {
+    display: none; }
+  #browser_steps li {
+    list-style: decimal;
+    padding: 5px; }
+    #browser_steps li.browser-step-with-error {
+      background-color: #ffd6d6;
+      border-radius: 4px; }
+    #browser_steps li:not(:first-child):hover {
+      opacity: 1.0; }
+    #browser_steps li .control {
+      padding-left: 5px;
+      padding-right: 5px; }
+      #browser_steps li .control a {
+        font-size: 70%; }
+    #browser_steps li.empty {
+      padding: 0px;
+      opacity: 0.35; }
+      #browser_steps li.empty .control {
+        display: none; }
+    #browser_steps li:hover {
+      background: #eee; }
+    #browser_steps li > label {
+      display: none; }
+
+@media only screen and (min-width: 760px) {
+  #browser-steps .flex-wrapper {
+    display: flex;
+    flex-flow: row;
+    height: 70vh;
+    font-size: 80%; }
+    #browser-steps .flex-wrapper #browser-steps-ui {
+      flex-grow: 1;
+      /* Allow it to grow and fill the available space */
+      flex-shrink: 1;
+      /* Allow it to shrink if needed */
+      flex-basis: 0;
+      /* Start with 0 base width so it stretches as much as possible */
+      background-color: #eee;
+      border-radius: 5px; }
+  #browser-steps-fieldlist {
+    flex-grow: 0;
+    /* Don't allow it to grow */
+    flex-shrink: 0;
+    /* Don't allow it to shrink */
+    flex-basis: auto;
+    /* Base width is determined by the content */
+    max-width: 400px;
+    /* Set a max width to prevent overflow */
+    padding-left: 1rem;
+    overflow-y: scroll; }
+  /*  this is duplicate :( */
+  #browsersteps-selector-wrapper {
+    height: 100% !important; } }
+
+/*  this is duplicate :( */
+#browsersteps-selector-wrapper {
+  width: 100%;
+  overflow-y: scroll;
+  position: relative;
+  height: 80vh;
+  /* nice tall skinny one */ }
+  #browsersteps-selector-wrapper > img {
+    position: absolute;
+    max-width: 100%; }
+  #browsersteps-selector-wrapper > canvas {
+    position: relative;
+    max-width: 100%; }
+    #browsersteps-selector-wrapper > canvas:hover {
+      cursor: pointer; }
+  #browsersteps-selector-wrapper .loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    max-width: 350px;
+    text-align: center; }
+  #browsersteps-selector-wrapper .spinner, #browsersteps-selector-wrapper .spinner:after {
+    width: 80px;
+    height: 80px;
+    font-size: 3px; }
+  #browsersteps-selector-wrapper #browsersteps-click-start {
+    color: var(--color-grey-400); }
+    #browsersteps-selector-wrapper #browsersteps-click-start:hover {
+      cursor: pointer; }
+
+ul#requests-extra_proxies {
+  list-style: none;
+  /* tidy up the table to look more "inline" */
+  /* each proxy entry is a `table` */ }
+  ul#requests-extra_proxies li > label {
+    display: none; }
+  ul#requests-extra_proxies table tr {
+    display: table-row; }
+    ul#requests-extra_proxies table tr input[type=text] {
+      width: 100%; }
+  @media only screen and (min-width: 1024px) {
+    ul#requests-extra_proxies table tr {
+      display: inline; } }
+
+#request {
+  /* Auto proxy scan/checker */ }
+  #request label[for=proxy] {
+    display: inline-block; }
+
+body.proxy-check-active #request {
+  /*
+    .proxy-status {
+      width: 2em;
+    }
+    */ }
+  body.proxy-check-active #request .proxy-check-details {
+    font-size: 80%;
+    color: #555;
+    display: block;
+    padding-left: 2em;
+    max-width: 500px; }
+  body.proxy-check-active #request .proxy-timing {
+    font-size: 80%;
+    padding-left: 1rem;
+    color: var(--color-link); }
+
+#recommended-proxy {
+  display: grid;
+  gap: 2rem;
+  padding-bottom: 1em; }
+  @media (min-width: 991px) {
+    #recommended-proxy {
+      grid-template-columns: repeat(2, 1fr); } }
+  #recommended-proxy > div {
+    border: 1px #aaa solid;
+    border-radius: 4px;
+    padding: 1em; }
+
+#extra-proxies-setting {
+  border: 1px solid var(--color-grey-800);
+  border-radius: 4px;
+  margin: 1em;
+  padding: 1em; }
+
+ul#requests-extra_browsers {
+  list-style: none;
+  /* tidy up the table to look more "inline" */
+  /* each proxy entry is a `table` */ }
+  ul#requests-extra_browsers li > label {
+    display: none; }
+  ul#requests-extra_browsers table tr {
+    display: table-row; }
+    ul#requests-extra_browsers table tr input[type=text] {
+      width: 100%; }
+  @media only screen and (min-width: 1280px) {
+    ul#requests-extra_browsers table tr {
+      display: inline; }
+      ul#requests-extra_browsers table tr input[type=text] {
+        width: 100%; } }
+
+#extra-browsers-setting {
+  border: 1px solid var(--color-grey-800);
+  border-radius: 4px;
+  margin: 1em;
+  padding: 1em; }
+
+.pagination-page-info {
+  color: #fff;
+  font-size: 0.85rem;
+  text-transform: capitalize; }
+
+.pagination.menu > * {
+  display: inline-block; }
+
+.pagination.menu li {
+  display: inline-block; }
+
+.pagination.menu a {
+  padding: 0.65rem;
+  margin: 3px;
+  border: none;
+  background: #444;
+  border-radius: 2px;
+  color: var(--color-text-button); }
+  .pagination.menu a.disabled {
+    display: none; }
+  .pagination.menu a.active {
+    font-weight: bold;
+    background: #888; }
+  .pagination.menu a:hover {
+    background: #999; }
+
+/* spinner */
+.spinner,
+.spinner:after {
+  border-radius: 50%;
+  width: 10px;
+  height: 10px; }
+
+/* Base spinner, will be used by DaisyUI loading component */
+.spinner,
+.spinner:after {
+  border-radius: 50%;
+  width: 10px; /* Example size, DaisyUI might override */
+  height: 10px; /* Example size, DaisyUI might override */
+}
+
+/*
+  The .spinner class itself can be simplified if DaisyUI's loading component is used.
+  If custom spinners are still needed, this can be kept and adapted.
+  For now, assuming DaisyUI's `loading` class will be used for spinners.
+*/
+
+/*
+ * -- THEME VARIABLES --
+ * Integrating with DaisyUI's theme system.
+ * We define colors here, and DaisyUI components will use them.
+ * The light theme is the default (applied to :root or html[data-theme="light"])
+ * The dark theme is applied via html[data-theme="dark"]
+ */
+
+:root, [data-theme="light"] {
+  /* DaisyUI semantic colors - map your existing colors here */
+  --p: #0078e7; /* primary - was --color-background-button-primary */
+  --pc: #ffffff; /* primary-content - text on primary */
+  
+  --s: rgb(66, 184, 221); /* secondary - was --color-background-button-secondary */
+  --sc: #ffffff; /* secondary-content */
+
+  --a: #ed5900; /* accent - was --color-menu-accent */
+  --ac: #ffffff; /* accent-content */
+
+  --n: #262626; /* neutral - was --color-grey-100 / text color */
+  --nc: #ffffff; /* neutral-content */
+
+  --b1: #ffffff; /* base-100 - page background - was --color-background */
+  --b2: #f2f2f2; /* base-200 - slightly darker bg - was --color-grey-900 */
+  --b3: #e0e0e0; /* base-300 - even darker - was --color-grey-800 */
+  --bc: #262626; /* base-content - text on base - was --color-text / --color-grey-200 */
+
+  --su: rgb(28, 184, 65); /* success - was --color-background-button-success */
+  --suc: #ffffff; /* success-content */
+
+  --wa: #ffcc00; /* warning - new, or map from existing if applicable */
+  --wac: #333333; /* warning-content */
+  
+  --er: rgb(202, 60, 60); /* error - was --color-background-button-error */
+  --erc: #ffffff; /* error-content */
+
+  --in: #1b98f8; /* info - was --color-link */
+  --inc: #ffffff; /* info-content */
+
+  /* Custom variables that don't directly map to DaisyUI semantic names but are used in the app */
+  --color-link-new-version: #e07171;
+  --color-text-watch-tag-list: rgba(231, 0, 105, 0.7); /* Made it slightly less transparent */
+  --color-api-key: var(--p); /* Use primary color for API key text */
+
+  /* Spinner color - can be based on primary or accent */
+  --spinner-color: var(--p);
+
+  /* Remove many old color variables if they are now covered by DaisyUI's system */
+}
+
+[data-theme="dark"] {
+  --p: #59bdfb; /* primary - was dark --color-link */
+  --pc: #002b4d; /* primary-content */
+
+  --s: rgb(77, 194, 231); /* secondary */
+  --sc: #002b4d;
+
+  --a: #ff8c4f; /* accent */
+  --ac: #002b4d;
+
+  --n: #dddddd; /* neutral - for text */
+  --nc: #111111;
+
+  --b1: #262626; /* base-100 - page background */
+  --b2: #111111; /* base-200 - slightly darker */
+  --b3: #000000; /* base-300 - even darker */
+  --bc: #dddddd; /* base-content - text on base */
+
+  --su: #21a12f; /* success */
+  --suc: #ffffff;
+
+  --wa: #ffbf00; /* warning */
+  --wac: #333333;
+  
+  --er: #ff6666; /* error - was dark --color-light-red / --color-watch-table-error */
+  --erc: #ffffff;
+
+  --in: #59bdfb; /* info */
+  --inc: #002b4d;
+
+  /* Custom dark theme variables */
+  --color-link-new-version: #f09191;
+  --color-text-watch-tag-list: rgba(250, 62, 146, 0.7);
+  --color-api-key: var(--p);
+
+  --spinner-color: var(--p);
+
+  /* Adjustments for specific components in dark mode if needed */
+   .icon-spread { /* Example from old darkmode */
+    filter: hue-rotate(-10deg) brightness(1.5); 
+  }
+  /* Other dark-mode specific icon/element adjustments can go here */
+}
+
+/* Styles for .arrow, used for sort direction indicators in table headers */
+.arrow {
+  border: solid currentColor; 
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 3px; 
+}
+  .arrow.right {
+    transform: rotate(-45deg);
+  }
+  .arrow.left {
+    transform: rotate(135deg);
+  }
+  .arrow.up, .arrow.asc {
+    transform: rotate(-135deg);
+  }
+  .arrow.down, .arrow.desc {
+    transform: rotate(45deg);
+  }
+
+/* #pure-menu-horizontal-spinner - kept for visual feedback during page loads */
+/* This is the colored bar at the top of the page */
+#pure-menu-horizontal-spinner {
+  height: 3px;
+  background: linear-gradient(-75deg, var(--a), var(--s), var(--p), var(--er)); /* Using theme colors */
+  background-size: 400% 400%;
+  width: 100%;
+  animation: gradient 200s ease infinite; 
+}
+
+body.spinner-active #pure-menu-horizontal-spinner {
+  animation: gradient 1s ease infinite; 
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Visually hidden class is standard, keep it if used, or use Tailwind's `sr-only` */
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px; 
+}
+
+/* Status icon - generic styling for small icons */
+.status-icon {
+  display: inline-block;
+  height: 1rem; 
+  vertical-align: middle; 
+}
+
+/* Overlay - Slide-out panel, likely for help/info */
+#overlay {
+  opacity: 0.95;
+  position: fixed;
+  width: 350px;
+  max-width: 100%;
+  height: 100%;
+  top: 0;
+  right: -350px; 
+  background-color: var(--b2); 
+  color: var(--bc); 
+  z-index: 40; 
+  transform: translateX(0);
+  transition: transform .5s ease; 
+}
+#overlay.visible {
+  transform: translateX(-100%); 
+}
+#overlay .content { 
+  font-size: 0.875rem; 
+  padding: 1rem; 
+  margin-top: 5rem; 
+  max-width: 400px;
+}
+
+/* Heart icon in navbar */
+#heartpath {
+  transition: all ease 0.3s !important; 
+}
+#heartpath:hover {
+  fill: var(--er) !important; 
+  transition: all ease 0.3s !important; 
+}
+
+/* Minitabs - custom tabs often used within edit sections for text preview */
+.minitabs-wrapper {
+  width: 100%;
+}
+.minitabs-wrapper > div[id] { 
+  padding: 1.25rem; 
+}
+.minitabs-wrapper .minitabs-content {
+  width: 100%;
+  display: flex;
+}
+.minitabs-wrapper .minitabs-content > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.minitabs-wrapper .minitabs { 
+  display: flex;
+}
+.minitabs-wrapper .minitab { 
+  flex: 1;
+  text-align: center;
+  padding: 0.75rem 0; 
+  text-decoration: none;
+  color: var(--bc);
+  background-color: var(--b2);
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-bottom: 1px solid var(--b3); 
+}
+.minitabs-wrapper .minitab:not(:last-child) {
+    border-right: 1px solid var(--b3); 
+}
+.minitabs-wrapper .minitab:hover {
+  background-color: var(--b3);
+}
+.minitabs-wrapper .minitab.active {
+  background-color: var(--b1);
+  color: var(--bc); 
+  font-weight: bold;
+  border-bottom-color: transparent; 
+}
+
+/* Styles for sticky preview pane in edit view */
+body.preview-text-enabled #text-preview { 
+    position: sticky;
+    top: 1rem; 
+    padding-top: 1rem; 
+    padding-bottom: 1rem; 
+    display: block !important; 
+}
+body.preview-text-enabled #edit-text-filter #pro-tips { /* Hide pro-tips when preview is active */
+    display: none; 
+}
+
+/* #activate-text-preview button specific positioning */
+#activate-text-preview {
+  right: 0;
+  position: absolute;
+  z-index: 3; 
+}
+
+/* .tab-pane-inner JS tab switching logic - fundamental for how tabs work */
+.tab-pane-inner:not(:target) {
+    display: none;
+}
+.tab-pane-inner:target {
+    display: block;
+}
+
+/* .beta-logo positioning */
+.beta-logo {
+  height: 50px; 
+  right: -3px;
+  top: -3px;
+  position: absolute;
+  z-index: 10; 
+}
+
+/* Browser Steps & Visual Selector specific complex component styling */
+#browser_steps li.browser-step-with-error { /* Highlight error steps */
+  background-color: var(--er); 
+  color: var(--erc); 
+  border-radius: var(--rounded-btn, 0.5rem); 
+}
+#browser_steps li:hover { /* Hover on steps */
+  background: var(--b2); 
+}
+
+#selector-wrapper { /* Container for visual selector canvas and image */
+  height: 100%;
+  text-align: center;
+  max-height: 70vh; 
+  overflow-y: auto; 
+  position: relative;
+  background-color: var(--b2); 
+}
+#selector-wrapper > img { /* Background image for selection */
+  position: absolute;
+  z-index: 4; 
+  max-width: 100%;
+}
+#selector-wrapper > canvas { /* Canvas for drawing selection boxes */
+  position: relative;
+  z-index: 5; 
+  max-width: 100%;
+}
+#selector-wrapper > canvas:hover {
+  cursor: pointer;
+}
+#selector-current-xpath { /* Display for the generated XPath */
+  font-size: 0.875rem; 
+  color: var(--bc);
+  background-color: var(--b1);
+  padding: 0.25rem 0.5rem; 
+  border-radius: var(--rounded-badge, 0.25rem);
+}
+/* Loader inside selector wrapper - relies on .spinner if not replaced by DaisyUI loading */
+#browsersteps-selector-wrapper .loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10; /* Above canvas/image */
+    max-width: 350px;
+    text-align: center; 
+}
+#browsersteps-selector-wrapper .spinner, 
+#browsersteps-selector-wrapper .spinner:after { /* Spinner size for this context */
+    width: 80px;
+    height: 80px;
+    font-size: 3px; /* Affects border thickness of spinner */
+}
+#browsersteps-selector-wrapper #browsersteps-click-start { /* "Click to start" text */
+    color: var(--bc); /* Use base-content, adjust opacity if needed */
+    opacity: 0.7;
+}
+#browsersteps-selector-wrapper #browsersteps-click-start:hover {
+    cursor: pointer;
+    opacity: 1;
+}
+
+
+/* .noselect - Standard utility to prevent text selection */
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Settings page: Extra Proxies/Browsers sections */
+#extra-proxies-setting, #extra-browsers-setting { 
+  border: 1px solid var(--b3); 
+  border-radius: var(--rounded-box, 1rem); 
+  margin: 1em 0; 
+  padding: 1em; 
+  background-color: var(--b1); 
+}
+
+/* Fetch error messages in watch list */
+.fetch-error { 
+  padding-top: 1em; 
+  font-size: 0.75rem; 
+  max-width: 400px; 
+  display: block;
+  color: var(--er); 
+}
+.fetch-error.notification-error a { 
+  color: var(--wa); /* Use warning color for notification errors if different */
+}
+
+/* Quick watch processor type (radios under new watch form) */
+#quick-watch-processor-type { 
+  color: var(--bc); 
+}
+
+/* Remaining styles for watch table, specifically the external link icon if custom PNG is still used */
+/* This is a fallback if SVGs in templates aren't sufficient or for specific existing cases */
+.watch-table .title-col a.external_link_icon + a[target="_blank"]::after,
+.watch-table .title-col a[target="_blank"].external_link_icon::after,
+.watch-table .current-diff-url::after {
+    /* content: url(data:image/png;base64,...); */ 
+    /* Keeping this commented as SVGs are preferred. If a specific PNG is needed, it can be re-added. */
+    /* Ensure proper alignment if re-enabled: margin: 0 3px 0 5px; */
+}
